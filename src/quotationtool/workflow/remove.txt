@@ -1,0 +1,116 @@
+Remove
+======
+
+In an quotationtool application removal of database items is done in a
+workflow. Users can ask for removing the item--they actually start a
+quotationtool.remove workflow process on the item. So removal is
+always controled by the site editors.
+
+We need to set up the worklist for editorial review.
+
+>>> from quotationtool.workflow.worklist import WorkList
+>>> from quotationtool.workflow.interfaces import IWorkList
+>>> import zope.component
+>>> editorialreview_items = WorkList()
+>>> zope.component.provideUtility(editorialreview_items, IWorkList, name='editorialreview')
+
+Register simple subscriber to make workflow events visible.
+
+>>> def log_workflow(event):
+...     print(event)
+
+>>> import zope.event
+>>> zope.event.subscribers.append(log_workflow)
+
+Get workflow definition.
+
+>>> from zope.wfmc.interfaces import IProcessDefinition
+>>> import zope.component
+>>> pd = zope.component.getUtility(IProcessDefinition,
+...                                'quotationtool.remove')
+
+>>> pd
+ProcessDefinition('quotationtool.remove')
+
+>>> pd.id
+'quotationtool.remove'
+
+Create some dummy item and container
+
+>>> from zope.container.sample import SampleContainer
+>>> from zope.container.contained import Contained
+>>> container = SampleContainer()
+>>> class Foo(Contained):
+...     __name__ = __parent__ = None
+
+The item must implement IRemovable, otherwise the workflow will end
+with an exception. Normally this would be done in zcml.
+
+>>> from zope.interface import classImplements
+>>> from quotationtool.workflow.interfaces import IRemovable
+>>> classImplements(Foo, IRemovable)
+
+>>> container['foo'] = foo = Foo()
+<...
+>>> foo.__name__
+u'foo'
+>>> foo.__parent__ == container
+True
+
+>>> len(container)
+1
+
+>>> proc = pd()
+
+The start method takes formal parameters:
+1) The user-id of the user who asks the object to be removed.
+2) The object which is asked to be removed. It is expected to implement zope.location.interfaces.IContained.
+3) The workflow history. 
+
+>>> proc.start('chris', foo, None)
+ProcessStarted(Process('quotationtool.remove'))
+Transition(None, Activity('quotationtool.remove.start'))
+ActivityStarted(Activity('quotationtool.remove.start'))
+ActivityFinished(Activity('quotationtool.remove.start'))
+Transition(Activity('quotationtool.remove.start'), Activity('quotationtool.remove.review'))
+ActivityStarted(Activity('quotationtool.remove.review'))
+...
+
+>>> item = editorialreview_items.pop()
+>>> item
+<quotationtool.workflow.workitem.RemoveWorkItem object at 0x...>
+
+>>> item.finish('postpone')
+<...
+WorkItemFinished(u'remove')
+ActivityFinished(Activity('quotationtool.remove.review'))
+Transition(Activity('quotationtool.remove.review'), Activity('quotationtool.remove.review'))
+ActivityStarted(Activity('quotationtool.remove.review'))
+...
+
+>>> len(container)
+1
+
+>>> item = editorialreview_items.pop()
+>>> item.finish('remove')
+<zope.lifecycleevent.ObjectRemovedEvent object at 0x...>
+<zope.container.contained.ContainerModifiedEvent object at 0x...>
+WorkItemFinished(u'remove')
+ActivityFinished(Activity('quotationtool.remove.review'))
+Transition(Activity('quotationtool.remove.review'), Activity('quotationtool.remove.delete'))
+ActivityStarted(Activity('quotationtool.remove.delete'))
+ActivityFinished(Activity('quotationtool.remove.delete'))
+Transition(Activity('quotationtool.remove.delete'), Activity('quotationtool.remove.remove'))
+ActivityStarted(Activity('quotationtool.remove.remove'))
+ActivityFinished(Activity('quotationtool.remove.remove'))
+ProcessFinished(Process('quotationtool.remove'))
+
+
+>>> len(container)
+0
+
+
+Remove simple logger from subscriber list. 
+
+>>> zope.event.subscribers.remove(log_workflow)
+

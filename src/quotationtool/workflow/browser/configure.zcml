@@ -1,0 +1,8 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope">
+
+  <include file="dependencies.zcml"/>
+  <include file="worklist.zcml"/>
+  <include file="remove.zcml"/>
+
+</configure>

@@ -1,0 +1,10 @@
+*~
+*.pyc
+.installed.cfg
+
+bin
+eggs
+extends-cache/*
+develop-eggs
+parts
+src/*.egg-info

@@ -1,0 +1,182 @@
+Article Demo
+============
+
+Demo with workflow defined in article.xpdl
+
+>>> import os
+>>> file_name = os.path.join(this_directory, 'article.xpdl')
+>>> zcml("""
+...     <configure
+...         xmlns="http://namespaces.zope.org/zope"
+...         xmlns:wfmc="http://namespaces.zope.org/wfmc"
+...         i18n_domain="test"
+...         >
+...
+...         <wfmc:xpdl
+...             file="%(file_name)s"
+...             process="articlepublication"
+...             id="quotationtool.article"
+...             integration="zope.wfmc.adapter.integration"
+...             />
+...
+...     </configure>
+... """ % locals())
+
+
+
+We need to set up some worklists.
+
+>>> from quotationtool.workflow.worklist import WorkList
+>>> from quotationtool.workflow.interfaces import IWorkList
+>>> import zope.component
+>>> contributor_items = WorkList()
+>>> zope.component.provideUtility(contributor_items, IWorkList, name='contributor')
+>>> editorialreview_items = WorkList()
+>>> zope.component.provideUtility(editorialreview_items, IWorkList, name='editorialreview')
+
+Register simple subscriber to make workflow events visible.
+
+>>> def log_workflow(event):
+...     print(event)
+
+>>> import zope.event
+>>> zope.event.subscribers.append(log_workflow)
+
+Get workflow definition.
+
+>>> from zope.wfmc.interfaces import IProcessDefinition
+>>> import zope.component
+>>> pd = zope.component.getUtility(IProcessDefinition,
+...                                'quotationtool.article')
+
+>>> pd
+ProcessDefinition('quotationtool.article')
+
+>>> import zope.wfmc.adapter
+>>> pd.integration is zope.wfmc.adapter.integration
+True
+
+Define a context
+
+>>> import zope.wfmc.interfaces
+>>> class PublicationContext:
+...     zope.interface.implements(zope.wfmc.interfaces.IProcessContext)
+...
+...     def processFinished(self, process, *decision):
+...         self.decision = decision
+>>> context = PublicationContext()
+
+Start workflow process
+
+>>> proc = pd(context)
+
+Workflow relevant data is a persistent object.
+
+>>> import persistent
+>>> isinstance(proc.workflowRelevantData, persistent.Persistent)
+True
+>>> proc.workflowRelevantData.__dict__
+{}
+
+>>> proc.start('chris', None)
+ProcessStarted(Process('quotationtool.article'))
+Transition(None, Activity('quotationtool.article.start'))
+ActivityStarted(Activity('quotationtool.article.start'))
+ActivityFinished(Activity('quotationtool.article.start'))
+Transition(Activity('quotationtool.article.start'), Activity('quotationtool.article.edit'))
+ActivityStarted(Activity('quotationtool.article.edit'))
+...
+
+>>> proc.workflowRelevantData.contributor == 'chris'
+True
+
+>>> proc.workflowRelevantData.article == None
+True
+
+>>> len(contributor_items)
+1
+
+>>> item = contributor_items.pop()
+>>> item
+<quotationtool.workflow.workitem.ContributorWorkItem object at 0x...>
+
+>>> item.finish('hi')
+Traceback (most recent call last):
+...
+ConstraintNotSatisfied: hi
+
+>>> item.finish('draft')
+<...
+WorkItemFinished(u'edit')
+ActivityFinished(Activity('quotationtool.article.edit'))
+Transition(Activity('quotationtool.article.edit'), Activity('quotationtool.article.edit'))
+ActivityStarted(Activity('quotationtool.article.edit'))
+...
+
+>>> proc.workflowRelevantData.save
+'draft'
+
+
+>>> item = contributor_items.pop()
+>>> item.finish('finish')
+<...
+WorkItemFinished(u'edit')
+ActivityFinished(Activity('quotationtool.article.edit'))
+Transition(Activity('quotationtool.article.edit'), Activity('quotationtool.article.review'))
+ActivityStarted(Activity('quotationtool.article.review'))
+...
+
+>>> len(contributor_items)
+0
+
+>>> len(editorialreview_items)
+1
+
+>>> item = editorialreview_items.pop()
+>>> item
+<quotationtool.workflow.workitem.EditorialReviewWorkItem object at 0x...>
+
+>>> item.finish('needs_changes')
+<...
+WorkItemFinished(u'review')
+ActivityFinished(Activity('quotationtool.article.review'))
+Transition(Activity('quotationtool.article.review'), Activity('quotationtool.article.edit'))
+ActivityStarted(Activity('quotationtool.article.edit'))
+...
+
+>>> proc.workflowRelevantData.publish
+'needs_changes'
+
+>>> len(editorialreview_items)
+0
+
+>>> len(contributor_items)
+1
+
+>>> item = contributor_items.pop()
+>>> item.finish('finish')
+<...
+WorkItemFinished(u'edit')
+ActivityFinished(Activity('quotationtool.article.edit'))
+Transition(Activity('quotationtool.article.edit'), Activity('quotationtool.article.review'))
+ActivityStarted(Activity('quotationtool.article.review'))
+...
+
+>>> item = editorialreview_items.pop()
+>>> item.finish('publish')
+<...
+ActivityFinished(Activity('quotationtool.article.review'))
+Transition(Activity('quotationtool.article.review'), Activity('quotationtool.article.publish'))
+ActivityStarted(Activity('quotationtool.article.publish'))
+ActivityFinished(Activity('quotationtool.article.publish'))
+ProcessFinished(Process('quotationtool.article'))
+
+>>> proc.workflowRelevantData.__dict__
+{'contributor': 'chris', 'article': None, 'save': 'finish', 'publish': 'publish'}
+
+
+Remove simple logger from subscriber list. 
+
+>>> zope.event.subscribers.remove(log_workflow)
+
+ 

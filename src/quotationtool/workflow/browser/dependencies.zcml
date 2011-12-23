@@ -1,0 +1,23 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope">
+
+  <include package="quotationtool.skin"/>
+  
+  <include package="z3c.template" file="meta.zcml"/>
+  <include package="z3c.macro" file="meta.zcml"/>
+  <include package="z3c.pagelet" file="meta.zcml"/>
+  <include package="zope.browserpage" file="meta.zcml"/>
+  <include package="zope.publisher" file="meta.zcml"/>
+  <include package="z3c.form" file="meta.zcml"/>
+  <include package="zope.viewlet" file="meta.zcml"/>
+  <include package="zope.app.publisher.browser" file="meta.zcml"/>
+  <include package="z3c.menu.ready2go" file="meta.zcml"/>
+
+  <include package="z3c.layer.pagelet"/>
+  <include package="z3c.pagelet"/>
+  <include package="zope.contentprovider"/>
+  <include package="z3c.form"/>
+  <include package="z3c.formui"/>
+  <include package="z3c.menu.ready2go"/>
+
+</configure>

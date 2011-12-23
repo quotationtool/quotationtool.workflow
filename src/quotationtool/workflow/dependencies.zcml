@@ -1,0 +1,18 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope">
+
+  <include package="zope.component" file="meta.zcml"/>
+  <include package="zope.security" file="meta.zcml"/>
+  <include package="zope.securitypolicy" file="meta.zcml"/>
+  <include package="zope.app.wfmc" file="meta.zcml"/>
+
+  <include package="zope.app.schema"/>
+  <include package="zope.component"/>
+  <include package="zope.site"/>
+  <include package="zope.security"/>
+  <include package="zope.annotation"/>
+  
+  <include package="quotationtool.security"/>
+  <include package="quotationtool.site"/>
+
+</configure>

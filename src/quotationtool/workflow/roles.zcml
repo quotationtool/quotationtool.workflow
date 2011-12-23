@@ -1,0 +1,40 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    i18n_domain="quotationtool">
+
+  <grant
+      permission="quotationtool.workflow.Contribute"
+      role="quotationtool.Member"
+      />
+
+  <grant
+      permission="quotationtool.workflow.Contribute"
+      role="quotationtool.Editor"
+      />
+
+  <grant
+      permission="quotationtool.workflow.Contribute"
+      role="quotationtool.Manager"
+      />
+
+  <grant
+      permission="quotationtool.workflow.ManageWorkflow"
+      role="quotationtool.Editor"
+      />
+
+  <grant
+      permission="quotationtool.workflow.ManageWorkflow"
+      role="quotationtool.Manager"
+      />
+
+  <grant
+      permission="quotationtool.workflow.DoEditorialReview"
+      role="quotationtool.Editor"
+      />
+
+  <grant
+      permission="quotationtool.workflow.DoEditorialReview"
+      role="quotationtool.Manager"
+      />
+
+</configure>

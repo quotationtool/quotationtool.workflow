@@ -1,0 +1,20 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    i18n_domain="quotationtool">
+
+  <permission
+      id="quotationtool.workflow.Contribute"
+      title="[contribute-workflow-permission-title] Contribute items / start workflows that begin with a request for addition or deletion etc. of an item."
+      />
+
+  <permission
+      id="quotationtool.workflow.ManageWorkflow"
+      title="[manage-workflow-permission-title] Manage workflows, visit worklists etc."
+      />
+
+  <permission
+      id="quotationtool.workflow.DoEditorialReview"
+      title="[do-editorial-review-permission-title] Perform an editorial review of a database item ."
+      />
+
+</configure>

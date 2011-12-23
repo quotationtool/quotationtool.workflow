@@ -1,0 +1,35 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:z3c="http://namespaces.zope.org/z3c"
+    >
+
+  <z3c:pagelet
+      for="..interfaces.IRemovable"
+      name="remove.html"
+      class=".remove.RemoveRequestForm"
+      permission="quotationtool.workflow.Contribute"
+      layer="quotationtool.skin.interfaces.IQuotationtoolBrowserLayer"
+      />
+
+  <z3c:pagelet
+      for="..interfaces.IRemovable"
+      name="removeProcessStarted.html"
+      class=".remove.RemoveProcessStarted"
+      permission="quotationtool.workflow.Contribute"
+      layer="quotationtool.skin.interfaces.IQuotationtoolBrowserLayer"
+      />
+  <z3c:template
+      for=".remove.RemoveProcessStarted"
+      template="remove_process_started.pt"
+      layer="quotationtool.skin.interfaces.IQuotationtoolBrowserLayer"
+      />
+
+  <z3c:pagelet
+      for="..workitem.RemoveWorkItem"
+      name="index.html"
+      class=".remove.RemoveEditorialReview"
+      permission="quotationtool.workflow.DoEditorialReview"
+      layer="quotationtool.skin.interfaces.IQuotationtoolBrowserLayer"
+      />
+
+</configure>

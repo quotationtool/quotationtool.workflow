@@ -1,0 +1,53 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope">
+
+  <class class=".history.WorkflowHistory">
+    <implements
+	interface="zope.container.interfaces.IContainerNamesContainer"
+	/>
+    <allow
+	attributes="__call__ reverse"/>
+    <require
+	permission="zope.ManageContent"
+	attributes="append"
+	/>
+  </class>
+  <adapter
+      factory=".history.workflow_history"
+      trusted="true"
+      />
+
+  <adapter
+      factory=".history.NotationNameChooser"
+      for=".history.WorkflowHistory"
+      provides="zope.container.interfaces.INameChooser"
+      />
+
+  <class class=".history.ProcessStartedNotation">
+  </class>
+  <subscriber handler=".history.processStartedSubscriber"/>
+
+  <class class=".history.ProcessFinishedNotation">
+  </class>
+  <subscriber handler=".history.processFinishedSubscriber"/>
+
+  <class class=".history.ActivityStartedNotation">
+  </class>
+  <subscriber handler=".history.activityStartedSubscriber"/>
+
+  <class class=".history.ActivityFinishedNotation">
+  </class>
+  <subscriber handler=".history.activityFinishedSubscriber"/>
+
+  <class class=".history.WorkItemFinishedNotation">
+  </class>
+  <subscriber handler=".history.workItemFinishedSubscriber"/>
+
+  <class class=".history.TransitionNotation">
+  </class>
+  <subscriber handler=".history.transitionSubscriber"/>
+
+
+
+
+</configure>

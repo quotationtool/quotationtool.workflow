@@ -1,0 +1,192 @@
+History
+=======
+
+
+We use the quotationtool.remove workflow for demonstration.
+
+Set up a worklist for editorial review.
+
+>>> from quotationtool.workflow.worklist import WorkList
+>>> from quotationtool.workflow.interfaces import IWorkList
+>>> import zope.component
+>>> editorialreview_items = WorkList()
+>>> zope.component.provideUtility(editorialreview_items, IWorkList, name='editorialreview')
+
+Register simple subscriber to make workflow events visible.
+
+>>> def log_workflow(event):
+...     print(event)
+
+>>> import zope.event
+>>> zope.event.subscribers.append(log_workflow)
+
+Get workflow definition.
+
+>>> from zope.wfmc.interfaces import IProcessDefinition
+>>> import zope.component
+>>> pd = zope.component.getUtility(IProcessDefinition,
+...                                'quotationtool.remove')
+
+>>> pd
+ProcessDefinition('quotationtool.remove')
+
+>>> pd.id
+'quotationtool.remove'
+
+Create some dummy item and container
+
+>>> from zope.container.sample import SampleContainer
+>>> from zope.container.contained import Contained
+>>> from quotationtool.workflow.interfaces import IRemovable
+>>> from zope.interface import implements
+>>> container = SampleContainer()
+>>> class Foo(Contained):
+...     implements(IRemovable)
+...     __name__ = __parent__ = None
+
+We still need an interaction:
+
+>>> from zope.security.management import newInteraction
+>>> interaction = newInteraction()
+
+Annotation
+~~~~~~~~~~
+
+The item and workflow control has to be annotatable to
+IWorkflowHistory. For object persistent in the ZODB this can easyly be
+done by implementing IHasWorkflowHistory. It is a marker interface and
+an annotation adapter (besides browser components) will be registered
+for the object automatically.
+
+>>> from zope.interface import classImplements
+>>> from zope.annotation.interfaces import IAttributeAnnotatable
+>>> from quotationtool.workflow.interfaces import IHasWorkflowHistory
+>>> classImplements(Foo, IAttributeAnnotatable)
+>>> classImplements(Foo, IHasWorkflowHistory)
+
+>>> container['foo'] = foo = Foo()
+<...
+>>> foo.__name__
+u'foo'
+>>> foo.__parent__ == container
+True
+
+>>> from quotationtool.workflow.interfaces import IWorkflowHistory
+>>> history = IWorkflowHistory(foo)
+>>> history
+<quotationtool.workflow.history.WorkflowHistory object at 0x...>
+
+>>> len(history)
+0
+
+History as formal parameter
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The implementation of workflow history with its subscribers to
+workflow events and activities will assume that the process has a
+workflow relevant data attribute called 'history'. It can be the
+workflow history itself or an object adaptable to IWorkflowHistory.
+
+The start method for quotationtool.remove process takes formal
+parameters:
+
+1) The user-id of the user who asks the object to be removed.
+2) The object which is asked to be removed. It is expected to 
+   implement zope.location.interfaces.IContained.
+3) The workflow history. 
+
+
+>>> proc = pd()
+>>> proc.start('chris', foo, history)
+<...
+ProcessStarted(Process('quotationtool.remove'))...
+Transition(None, Activity('quotationtool.remove.start'))...
+ActivityStarted(Activity('quotationtool.remove.start'))...
+ActivityFinished(Activity('quotationtool.remove.start'))...
+Transition(Activity('quotationtool.remove.start'), Activity('quotationtool.remove.review'))...
+ActivityStarted(Activity('quotationtool.remove.review'))...
+
+>>> len(history)
+6
+
+>>> item = editorialreview_items.pop()
+>>> item
+<quotationtool.workflow.workitem.RemoveWorkItem object at 0x...>
+
+>>> item.finish('postpone')
+<...
+WorkItemFinished(u'remove')...
+ActivityFinished(Activity('quotationtool.remove.review'))...
+Transition(Activity('quotationtool.remove.review'), Activity('quotationtool.remove.review'))...
+ActivityStarted(Activity('quotationtool.remove.review'))...
+...
+
+>>> len(history)
+10
+
+>>> item = editorialreview_items.pop()
+>>> item.finish('remove')
+<...
+WorkItemFinished(u'remove')...
+ActivityFinished(Activity('quotationtool.remove.review'))...
+Transition(Activity('quotationtool.remove.review'), Activity('quotationtool.remove.delete'))...
+ActivityStarted(Activity('quotationtool.remove.delete'))...
+ActivityFinished(Activity('quotationtool.remove.delete'))...
+Transition(Activity('quotationtool.remove.delete'), Activity('quotationtool.remove.remove'))...
+ActivityStarted(Activity('quotationtool.remove.remove'))...
+ActivityFinished(Activity('quotationtool.remove.remove'))...
+ProcessFinished(Process('quotationtool.remove'))...
+
+
+>>> len(history)
+19
+
+>>> for notation in history():
+...     print(notation)
+    process-started-notation
+    transition-notation
+    activity-started-notation
+    activity-finished-notation
+    transition-notation
+    activity-started-notation
+    workitem-finished-notation
+    activity-finished-notation
+    transition-notation
+    activity-started-notation
+    workitem-finished-notation
+    activity-finished-notation
+    transition-notation
+    activity-started-notation
+    activity-finished-notation
+    transition-notation
+    activity-started-notation
+    activity-finished-notation
+    process-finished-notation
+
+
+
+    process-started-notation
+    Transition(None, Activity('quotationtool.remove.start'))
+    ActivityStarted(Activity('quotationtool.remove.start'))
+    ActivityFinished(Activity('quotationtool.remove.start'))
+    Transition(Activity('quotationtool.remove.start'), Activity('quotationtool.remove.review'))
+    ActivityStarted(Activity('quotationtool.remove.review'))
+    WorkItemFinished(u'remove')
+    ActivityFinished(Activity('quotationtool.remove.review'))
+    Transition(Activity('quotationtool.remove.review'), Activity('quotationtool.remove.review'))
+    ActivityStarted(Activity('quotationtool.remove.review'))
+    WorkItemFinished(u'remove')
+    ActivityFinished(Activity('quotationtool.remove.review'))
+    Transition(Activity('quotationtool.remove.review'), Activity('quotationtool.remove.delete'))
+    ActivityStarted(Activity('quotationtool.remove.delete'))
+    ActivityFinished(Activity('quotationtool.remove.delete'))
+    Transition(Activity('quotationtool.remove.delete'), Activity('quotationtool.remove.remove'))
+    ActivityStarted(Activity('quotationtool.remove.remove'))
+    ActivityFinished(Activity('quotationtool.remove.remove'))
+    process-finished-notation
+
+
+Remove simple logger from subscriber list. 
+
+>>> zope.event.subscribers.remove(log_workflow)
+

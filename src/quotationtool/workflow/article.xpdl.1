@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xpdl:Package xmlns:xpdl="http://www.wfmc.org/2008/XPDL2.1" xmlns="http://www.wfmc.org/2008/XPDL2.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Id="quotationtoolarticle" Name="Quotationtool Article" xsi:schemaLocation="http://www.wfmc.org/2008/XPDL2.1 http://www.wfmc.org/standards/docs/bpmnxpdl_31.xsd">
+    <xpdl:PackageHeader>
+        <xpdl:XPDLVersion>2.1</xpdl:XPDLVersion>
+        <xpdl:Vendor>quotationtool.org</xpdl:Vendor>
+        <xpdl:Created>2011-11-18 09:47:48</xpdl:Created>
+    </xpdl:PackageHeader>
+    <xpdl:RedefinableHeader PublicationStatus="UNDER_TEST">
+        <xpdl:Author>Christian Lück</xpdl:Author>
+    </xpdl:RedefinableHeader>
+    <xpdl:ConformanceClass GraphConformance="NON_BLOCKED"/>
+    <xpdl:Participants>
+        <xpdl:Participant Id="contributor" Name="Contributor">
+            <xpdl:ParticipantType Type="ROLE"/>
+            <xpdl:Description>Contributor/Author of the article</xpdl:Description>
+        </xpdl:Participant>
+        <xpdl:Participant Id="editor" Name="Editor">
+            <xpdl:ParticipantType Type="ROLE"/>
+            <xpdl:Description>Makes an editorial review of the article, rejects or publishes</xpdl:Description>
+        </xpdl:Participant>
+        <xpdl:Participant Id="system" Name="System">
+            <xpdl:ParticipantType Type="SYSTEM"/>
+            <xpdl:Description>Automatic</xpdl:Description>
+        </xpdl:Participant>
+    </xpdl:Participants>
+    <xpdl:Applications>
+        <xpdl:Application Id="edit" Name="Edit">
+            <xpdl:Description>Edit application has the out-parameter 'safe' which decides if the item is safed as draft, goes to trash or is finished (goes to next acticity).</xpdl:Description>
+            <xpdl:FormalParameters>
+                <xpdl:FormalParameter Id="save" IsArray="false" Mode="OUT" Name="Save Option">
+                    <xpdl:DataType>
+                        <xpdl:BasicType Type="STRING"/>
+                    </xpdl:DataType>
+                    <xpdl:Description>Can be 'finish', 'draft' or 'trash'.</xpdl:Description>
+                </xpdl:FormalParameter>
+            </xpdl:FormalParameters>
+        </xpdl:Application>
+        <xpdl:Application Id="review" Name="Editorial Review">
+            <xpdl:Description>Editorial review of workflow item. Has an out-parameter 'publish' which decides if published, rejected or decision is postponed.</xpdl:Description>
+            <xpdl:FormalParameters>
+                <xpdl:FormalParameter Id="publish" IsArray="false" Mode="OUT" Name="Publish">
+                    <xpdl:DataType>
+                        <xpdl:BasicType Type="STRING"/>
+                    </xpdl:DataType>
+                    <xpdl:InitialValue>publish</xpdl:InitialValue>
+                    <xpdl:Description>Can either be 'publish', 'reject' or 'postpone'.</xpdl:Description>
+                </xpdl:FormalParameter>
+            </xpdl:FormalParameters>
+        </xpdl:Application>
+    </xpdl:Applications>
+    <xpdl:DataFields>
+        <xpdl:DataField Id="publish" IsArray="false" Name="Publish">
+            <xpdl:DataType>
+                <xpdl:BasicType Type="STRING"/>
+            </xpdl:DataType>
+            <xpdl:InitialValue>publish</xpdl:InitialValue>
+        </xpdl:DataField>
+        <xpdl:DataField Id="save" IsArray="false" Name="Save Option">
+            <xpdl:DataType>
+                <xpdl:BasicType Type="STRING"/>
+            </xpdl:DataType>
+            <xpdl:InitialValue>finish</xpdl:InitialValue>
+        </xpdl:DataField>
+    </xpdl:DataFields>
+    <xpdl:Pools>
+        <xpdl:Pool BoundaryVisible="true" Id="quotationtoolarticle_pool1" MainPool="true" Name="Article Publication" Orientation="HORIZONTAL" Process="articlepublication">
+            <xpdl:Lanes>
+                <xpdl:Lane Id="quotationtoolarticle_pool1_lan2" Name="Contributor">
+                    <xpdl:NodeGraphicsInfos>
+                        <xpdl:NodeGraphicsInfo BorderColor="0,0,0" FillColor="220,220,220" IsVisible="true" ToolId="JaWE"/>
+                        <xpdl:NodeGraphicsInfo BorderColor="0,0,0" FillColor="220,220,220" IsVisible="true" ToolId="JaWE"/>
+                    </xpdl:NodeGraphicsInfos>
+                    <xpdl:Performers>
+                        <xpdl:Performer>contributor</xpdl:Performer>
+                    </xpdl:Performers>
+                </xpdl:Lane>
+                <xpdl:Lane Id="quotationtoolarticle_pool1_lan3" Name="Editor">
+                    <xpdl:NodeGraphicsInfos>
+                        <xpdl:NodeGraphicsInfo BorderColor="0,0,0" FillColor="220,220,220" IsVisible="true" ToolId="JaWE"/>
+                        <xpdl:NodeGraphicsInfo BorderColor="0,0,0" FillColor="220,220,220" IsVisible="true" ToolId="JaWE"/>
+                    </xpdl:NodeGraphicsInfos>
+                    <xpdl:Performers>
+                        <xpdl:Performer>editor</xpdl:Performer>
+                    </xpdl:Performers>
+                </xpdl:Lane>
+            </xpdl:Lanes>
+            <xpdl:NodeGraphicsInfos>
+                <xpdl:NodeGraphicsInfo BorderColor="0,0,0" FillColor="255,255,215" IsVisible="true" ToolId="JaWE"/>
+            </xpdl:NodeGraphicsInfos>
+        </xpdl:Pool>
+    </xpdl:Pools>
+    <xpdl:WorkflowProcesses>
+        <xpdl:WorkflowProcess AccessLevel="PUBLIC" Id="articlepublication" Name="Article Publication">
+            <xpdl:ProcessHeader>
+                <xpdl:Created>2011-11-18 10:29:20</xpdl:Created>
+            </xpdl:ProcessHeader>
+            <xpdl:RedefinableHeader>
+                <xpdl:Author>Christian Lück</xpdl:Author>
+            </xpdl:RedefinableHeader>
+            <xpdl:Activities>
+                <xpdl:Activity FinishMode="Automatic" Id="start" Name="Start" StartMode="Automatic">
+                    <xpdl:Event>
+                        <xpdl:StartEvent Trigger="None"/>
+                    </xpdl:Event>
+                    <xpdl:NodeGraphicsInfos>
+                        <xpdl:NodeGraphicsInfo BorderColor="0,0,0" FillColor="102,204,51" Height="31" IsVisible="true" LaneId="quotationtoolarticle_pool1_lan2" ToolId="JaWE" Width="31">
+                            <xpdl:Coordinates XCoordinate="59" YCoordinate="34"/>
+                        </xpdl:NodeGraphicsInfo>
+                    </xpdl:NodeGraphicsInfos>
+                </xpdl:Activity>
+                <xpdl:Activity FinishMode="Automatic" Id="edit" Name="Edit" StartMode="Automatic">
+                    <xpdl:Implementation>
+                        <xpdl:Task>
+                            <xpdl:TaskApplication Id="edit">
+                                <xpdl:ActualParameters>
+                                    <xpdl:ActualParameter>save</xpdl:ActualParameter>
+                                </xpdl:ActualParameters>
+                            </xpdl:TaskApplication>
+                        </xpdl:Task>
+                    </xpdl:Implementation>
+                    <xpdl:Performers>
+                        <xpdl:Performer>contributor</xpdl:Performer>
+                    </xpdl:Performers>
+                    <xpdl:TransitionRestrictions>
+                        <xpdl:TransitionRestriction>
+                            <xpdl:Join Type="Exclusive"/>
+                            <xpdl:Split Type="Parallel">
+                                <xpdl:TransitionRefs>
+                                    <xpdl:TransitionRef Id="articlepublication_tra3"/>
+                                    <xpdl:TransitionRef Id="articlepublication_tra2"/>
+                                    <xpdl:TransitionRef Id="articlepublication_tra4"/>
+                                </xpdl:TransitionRefs>
+                            </xpdl:Split>
+                        </xpdl:TransitionRestriction>
+                    </xpdl:TransitionRestrictions>
+                    <xpdl:NodeGraphicsInfos>
+                        <xpdl:NodeGraphicsInfo BorderColor="0,0,0" FillColor="255,204,204" Height="60" IsVisible="true" LaneId="quotationtoolarticle_pool1_lan2" ToolId="JaWE" Width="90">
+                            <xpdl:Coordinates XCoordinate="200" YCoordinate="31"/>
+                        </xpdl:NodeGraphicsInfo>
+                    </xpdl:NodeGraphicsInfos>
+                </xpdl:Activity>
+                <xpdl:Activity FinishMode="Automatic" Id="trash" Name="Trash" StartMode="Automatic">
+                    <xpdl:Event>
+                        <xpdl:EndEvent Result="None"/>
+                    </xpdl:Event>
+                    <xpdl:NodeGraphicsInfos>
+                        <xpdl:NodeGraphicsInfo BorderColor="0,0,0" FillColor="236,120,98" Height="31" IsVisible="true" LaneId="quotationtoolarticle_pool1_lan2" ToolId="JaWE" Width="31">
+                            <xpdl:Coordinates XCoordinate="650" YCoordinate="47"/>
+                        </xpdl:NodeGraphicsInfo>
+                    </xpdl:NodeGraphicsInfos>
+                </xpdl:Activity>
+                <xpdl:Activity FinishMode="Automatic" Id="review" Name="Editorial Review" StartMode="Automatic">
+                    <xpdl:Implementation>
+                        <xpdl:Task>
+                            <xpdl:TaskApplication Id="review">
+                                <xpdl:ActualParameters>
+                                    <xpdl:ActualParameter>publish</xpdl:ActualParameter>
+                                </xpdl:ActualParameters>
+                            </xpdl:TaskApplication>
+                        </xpdl:Task>
+                    </xpdl:Implementation>
+                    <xpdl:Performers>
+                        <xpdl:Performer>editor</xpdl:Performer>
+                    </xpdl:Performers>
+                    <xpdl:TransitionRestrictions>
+                        <xpdl:TransitionRestriction>
+                            <xpdl:Join Type="Exclusive"/>
+                            <xpdl:Split Type="Parallel">
+                                <xpdl:TransitionRefs>
+                                    <xpdl:TransitionRef Id="articlepublication_tra6"/>
+                                    <xpdl:TransitionRef Id="articlepublication_tra5"/>
+                                    <xpdl:TransitionRef Id="articlepublication_tra7"/>
+                                    <xpdl:TransitionRef Id="articlepublication_tra8"/>
+                                </xpdl:TransitionRefs>
+                            </xpdl:Split>
+                        </xpdl:TransitionRestriction>
+                    </xpdl:TransitionRestrictions>
+                    <xpdl:NodeGraphicsInfos>
+                        <xpdl:NodeGraphicsInfo BorderColor="0,0,0" FillColor="255,204,204" Height="60" IsVisible="true" LaneId="quotationtoolarticle_pool1_lan3" ToolId="JaWE" Width="90">
+                            <xpdl:Coordinates XCoordinate="361" YCoordinate="51"/>
+                        </xpdl:NodeGraphicsInfo>
+                    </xpdl:NodeGraphicsInfos>
+                </xpdl:Activity>
+                <xpdl:Activity FinishMode="Automatic" Id="publish" Name="Publish" StartMode="Automatic">
+                    <xpdl:Event>
+                        <xpdl:EndEvent Result="None"/>
+                    </xpdl:Event>
+                    <xpdl:NodeGraphicsInfos>
+                        <xpdl:NodeGraphicsInfo BorderColor="0,0,0" FillColor="236,120,98" Height="31" IsVisible="true" LaneId="quotationtoolarticle_pool1_lan3" ToolId="JaWE" Width="31">
+                            <xpdl:Coordinates XCoordinate="651" YCoordinate="23"/>
+                        </xpdl:NodeGraphicsInfo>
+                    </xpdl:NodeGraphicsInfos>
+                </xpdl:Activity>
+                <xpdl:Activity FinishMode="Automatic" Id="reject" Name="Reject" StartMode="Automatic">
+                    <xpdl:Event>
+                        <xpdl:EndEvent Result="None"/>
+                    </xpdl:Event>
+                    <xpdl:NodeGraphicsInfos>
+                        <xpdl:NodeGraphicsInfo BorderColor="0,0,0" FillColor="236,120,98" Height="31" IsVisible="true" LaneId="quotationtoolarticle_pool1_lan3" ToolId="JaWE" Width="31">
+                            <xpdl:Coordinates XCoordinate="654" YCoordinate="83"/>
+                        </xpdl:NodeGraphicsInfo>
+                    </xpdl:NodeGraphicsInfos>
+                </xpdl:Activity>
+            </xpdl:Activities>
+            <xpdl:Transitions>
+                <xpdl:Transition From="start" Id="articlepublication_tra1" To="edit">
+                    <xpdl:ConnectorGraphicsInfos>
+                        <xpdl:ConnectorGraphicsInfo FillColor="0,0,0" IsVisible="true" Style="NO_ROUTING_ORTHOGONAL" ToolId="JaWE"/>
+                    </xpdl:ConnectorGraphicsInfos>
+                </xpdl:Transition>
+                <xpdl:Transition From="edit" Id="articlepublication_tra2" To="trash">
+                    <xpdl:Condition Type="CONDITION">save == 'trash'</xpdl:Condition>
+                    <xpdl:ConnectorGraphicsInfos>
+                        <xpdl:ConnectorGraphicsInfo FillColor="0,0,0" IsVisible="true" Style="NO_ROUTING_SPLINE" ToolId="JaWE"/>
+                    </xpdl:ConnectorGraphicsInfos>
+                </xpdl:Transition>
+                <xpdl:Transition From="edit" Id="articlepublication_tra3" To="edit">
+                    <xpdl:Condition Type="CONDITION">save == 'draft'</xpdl:Condition>
+                    <xpdl:ConnectorGraphicsInfos>
+                        <xpdl:ConnectorGraphicsInfo FillColor="0,0,0" IsVisible="true" Style="NO_ROUTING_BEZIER" ToolId="JaWE">
+                            <xpdl:Coordinates XCoordinate="230" YCoordinate="12"/>
+                            <xpdl:Coordinates XCoordinate="330" YCoordinate="12"/>
+                        </xpdl:ConnectorGraphicsInfo>
+                    </xpdl:ConnectorGraphicsInfos>
+                </xpdl:Transition>
+                <xpdl:Transition From="edit" Id="articlepublication_tra4" To="review">
+                    <xpdl:Condition Type="CONDITION">save == 'finish'</xpdl:Condition>
+                    <xpdl:ConnectorGraphicsInfos>
+                        <xpdl:ConnectorGraphicsInfo FillColor="0,0,0" IsVisible="true" Style="NO_ROUTING_SPLINE" ToolId="JaWE"/>
+                    </xpdl:ConnectorGraphicsInfos>
+                </xpdl:Transition>
+                <xpdl:Transition From="review" Id="articlepublication_tra5" To="publish">
+                    <xpdl:Condition Type="CONDITION">publish == 'publish'</xpdl:Condition>
+                    <xpdl:ConnectorGraphicsInfos>
+                        <xpdl:ConnectorGraphicsInfo FillColor="0,0,0" IsVisible="true" Style="NO_ROUTING_ORTHOGONAL" ToolId="JaWE"/>
+                    </xpdl:ConnectorGraphicsInfos>
+                </xpdl:Transition>
+                <xpdl:Transition From="review" Id="articlepublication_tra6" To="reject">
+                    <xpdl:Condition Type="CONDITION">publish == 'reject'</xpdl:Condition>
+                    <xpdl:ConnectorGraphicsInfos>
+                        <xpdl:ConnectorGraphicsInfo FillColor="0,0,0" IsVisible="true" Style="NO_ROUTING_SPLINE" ToolId="JaWE"/>
+                    </xpdl:ConnectorGraphicsInfos>
+                </xpdl:Transition>
+                <xpdl:Transition From="review" Id="articlepublication_tra7" To="edit">
+                    <xpdl:Condition Type="CONDITION">publish == 'needs_changes'</xpdl:Condition>
+                    <xpdl:ConnectorGraphicsInfos>
+                        <xpdl:ConnectorGraphicsInfo FillColor="0,0,0" IsVisible="true" Style="NO_ROUTING_SPLINE" ToolId="JaWE">
+                            <xpdl:Coordinates XCoordinate="183" YCoordinate="99"/>
+                        </xpdl:ConnectorGraphicsInfo>
+                    </xpdl:ConnectorGraphicsInfos>
+                </xpdl:Transition>
+                <xpdl:Transition From="review" Id="articlepublication_tra8" To="review">
+                    <xpdl:Condition Type="CONDITION">publish == 'postpone'</xpdl:Condition>
+                    <xpdl:ConnectorGraphicsInfos>
+                        <xpdl:ConnectorGraphicsInfo FillColor="0,0,0" IsVisible="true" Style="NO_ROUTING_BEZIER" ToolId="JaWE">
+                            <xpdl:Coordinates XCoordinate="392" YCoordinate="215"/>
+                            <xpdl:Coordinates XCoordinate="492" YCoordinate="215"/>
+                        </xpdl:ConnectorGraphicsInfo>
+                    </xpdl:ConnectorGraphicsInfos>
+                </xpdl:Transition>
+            </xpdl:Transitions>
+        </xpdl:WorkflowProcess>
+    </xpdl:WorkflowProcesses>
+    <xpdl:ExtendedAttributes>
+        <xpdl:ExtendedAttribute Name="EDITING_TOOL" Value="Together Workflow Editor"/>
+        <xpdl:ExtendedAttribute Name="EDITING_TOOL_VERSION" Value="4.1-1-20111118-0922"/>
+        <xpdl:ExtendedAttribute Name="JaWE_CONFIGURATION" Value="default"/>
+    </xpdl:ExtendedAttributes>
+</xpdl:Package>

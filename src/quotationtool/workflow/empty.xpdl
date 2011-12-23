@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xpdl:Package xmlns:xpdl="http://www.wfmc.org/2008/XPDL2.1" xmlns="http://www.wfmc.org/2008/XPDL2.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Id="quotationtool" Name="Quotationtool" xsi:schemaLocation="http://www.wfmc.org/2008/XPDL2.1 http://www.wfmc.org/standards/docs/bpmnxpdl_31.xsd">
+    <xpdl:PackageHeader>
+        <xpdl:XPDLVersion>2.1</xpdl:XPDLVersion>
+        <xpdl:Vendor>quotationtool.org</xpdl:Vendor>
+        <xpdl:Created>2011-11-18 09:47:48</xpdl:Created>
+    </xpdl:PackageHeader>
+    <xpdl:RedefinableHeader PublicationStatus="UNDER_TEST">
+        <xpdl:Author>Christian Lück</xpdl:Author>
+    </xpdl:RedefinableHeader>
+    <xpdl:ConformanceClass GraphConformance="NON_BLOCKED"/>
+    <xpdl:Participants>
+        <xpdl:Participant Id="contributor" Name="Contributor">
+            <xpdl:ParticipantType Type="ROLE"/>
+            <xpdl:Description>Contributor/Author of the article</xpdl:Description>
+        </xpdl:Participant>
+        <xpdl:Participant Id="editor" Name="Editor">
+            <xpdl:ParticipantType Type="ROLE"/>
+            <xpdl:Description>Makes an editorial review of the article, rejects or publishes</xpdl:Description>
+        </xpdl:Participant>
+        <xpdl:Participant Id="technicaleditor" Name="Technical Editor">
+            <xpdl:ParticipantType Type="ROLE"/>
+        </xpdl:Participant>
+        <xpdl:Participant Id="system" Name="System">
+            <xpdl:ParticipantType Type="SYSTEM"/>
+            <xpdl:Description>Automatic</xpdl:Description>
+        </xpdl:Participant>
+    </xpdl:Participants>
+    <xpdl:Applications>
+        <xpdl:Application Id="edit" Name="Edit">
+            <xpdl:Description>Edit application has the out-parameter 'safe' which decides if the item is safed as draft, goes to trash or is finished (goes to next acticity).</xpdl:Description>
+            <xpdl:FormalParameters>
+                <xpdl:FormalParameter Id="save" IsArray="false" Mode="OUT" Name="Save Option">
+                    <xpdl:DataType>
+                        <xpdl:BasicType Type="STRING"/>
+                    </xpdl:DataType>
+                    <xpdl:Description>Can be 'finish', 'draft' or 'trash'.</xpdl:Description>
+                </xpdl:FormalParameter>
+            </xpdl:FormalParameters>
+        </xpdl:Application>
+        <xpdl:Application Id="review" Name="Editorial Review">
+            <xpdl:Description>Editorial review of workflow item. Has an out-parameter 'publish' which decides if published, rejected or decision is postponed.</xpdl:Description>
+            <xpdl:FormalParameters>
+                <xpdl:FormalParameter Id="publish" IsArray="false" Mode="OUT" Name="Publish">
+                    <xpdl:DataType>
+                        <xpdl:BasicType Type="STRING"/>
+                    </xpdl:DataType>
+                    <xpdl:InitialValue>publish</xpdl:InitialValue>
+                    <xpdl:Description>Can either be 'publish', 'reject' or 'postpone'.</xpdl:Description>
+                </xpdl:FormalParameter>
+            </xpdl:FormalParameters>
+        </xpdl:Application>
+        <xpdl:Application Id="technicalreview" Name="Technical Review">
+            <xpdl:Description>Technical review of workflow item. Has an out-parameter 'correctness' which decides if technically ok, rejected or decision is postponed.</xpdl:Description>
+            <xpdl:FormalParameters>
+                <xpdl:FormalParameter Id="correctness" IsArray="false" Mode="OUT" Name="correctness">
+                    <xpdl:DataType>
+                        <xpdl:BasicType Type="STRING"/>
+                    </xpdl:DataType>
+                    <xpdl:InitialValue>publish</xpdl:InitialValue>
+                    <xpdl:Description>Can either be 'ok', 'reject' or 'postpone'.</xpdl:Description>
+                </xpdl:FormalParameter>
+            </xpdl:FormalParameters>
+        </xpdl:Application>
+    </xpdl:Applications>
+    <xpdl:DataFields>
+        <xpdl:DataField Id="publish" IsArray="false" Name="Publish">
+            <xpdl:DataType>
+                <xpdl:BasicType Type="STRING"/>
+            </xpdl:DataType>
+            <xpdl:InitialValue>publish</xpdl:InitialValue>
+        </xpdl:DataField>
+        <xpdl:DataField Id="save" IsArray="false" Name="Save Option">
+            <xpdl:DataType>
+                <xpdl:BasicType Type="STRING"/>
+            </xpdl:DataType>
+            <xpdl:InitialValue>finish</xpdl:InitialValue>
+        </xpdl:DataField>
+        <xpdl:DataField Id="correctness" IsArray="false" Name="correctness">
+            <xpdl:DataType>
+                <xpdl:BasicType Type="STRING"/>
+            </xpdl:DataType>
+        </xpdl:DataField>
+    </xpdl:DataFields>
+    <xpdl:ExtendedAttributes>
+        <xpdl:ExtendedAttribute Name="EDITING_TOOL" Value="Together Workflow Editor"/>
+        <xpdl:ExtendedAttribute Name="EDITING_TOOL_VERSION" Value="4.1-1-20111118-0922"/>
+        <xpdl:ExtendedAttribute Name="JaWE_CONFIGURATION" Value="default"/>
+    </xpdl:ExtendedAttributes>
+</xpdl:Package>

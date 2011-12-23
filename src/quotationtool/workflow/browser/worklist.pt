@@ -1,0 +1,16 @@
+<div i18n:domain="quotationtool">
+
+  <h1 i18n:translate="">
+    <span i18n:name="title" tal:content="context/zope:title|nothing">Contribution</span> 
+    Work Items
+  </h1>
+
+  <p tal:content="context/zope:description|default">List of work items.</p>
+
+  <div class="batch" tal:content="structure view/renderBatch"/>
+
+  <div tal:replace="structure view/renderTable"/>
+
+  <div class="batch" tal:content="structure view/renderBatch"/>
+
+</div>

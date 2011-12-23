@@ -1,0 +1,88 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:z3c="http://namespaces.zope.org/z3c"
+    >
+
+  <z3c:pagelet
+      for="..interfaces.IWorkFlowContainer"
+      name="index.html"
+      class=".worklist.ListWorkLists"
+      permission="quotationtool.workflow.ManageWorkflow"
+      layer="quotationtool.skin.interfaces.IQuotationtoolBrowserLayer"
+      />
+  <z3c:template
+      for=".worklist.ListWorkLists"
+      template="listworklists.pt"
+      layer="quotationtool.skin.interfaces.IQuotationtoolBrowserLayer"
+      />
+
+  <z3c:pagelet
+      for="..interfaces.IWorkList"
+      name="index.html"
+      class=".worklist.WorkListTable"
+      permission="quotationtool.workflow.ManageWorkflow"
+      layer="quotationtool.skin.interfaces.IQuotationtoolBrowserLayer"
+      />
+  <z3c:template
+      for=".worklist.WorkListTable"
+      template="worklist.pt"
+      layer="quotationtool.skin.interfaces.IQuotationtoolBrowserLayer"
+      />
+
+  <adapter
+      for="*
+           quotationtool.skin.interfaces.IQuotationtoolBrowserLayer
+           .worklist.IWorkListTable
+           .worklist.ISortingColumn"
+      provides="z3c.table.interfaces.IColumnHeader"
+      factory="quotationtool.skin.browser.table.SortingColumnHeader"
+      />
+
+  <!--adapter
+      name="process"
+      for="*
+           quotationtool.skin.interfaces.IQuotationtoolBrowserLayer
+           .worklist.IWorkListTable"
+      provides="z3c.table.interfaces.IColumn"
+      factory=".worklist.ProcessColumn"
+      /-->
+
+  <adapter
+      name="workitem"
+      for="*
+           quotationtool.skin.interfaces.IQuotationtoolBrowserLayer
+           .worklist.IWorkListTable"
+      provides="z3c.table.interfaces.IColumn"
+      factory=".worklist.WorkItemColumn"
+      />
+
+  <!--adapter
+      name="contributor"
+      for="*
+           quotationtool.skin.interfaces.IQuotationtoolBrowserLayer
+           .worklist.IWorkListTable"
+      provides="z3c.table.interfaces.IColumn"
+      factory=".worklist.ContributorColumn"
+      /-->
+
+  <adapter
+      name="lastactivityby"
+      for="*
+           quotationtool.skin.interfaces.IQuotationtoolBrowserLayer
+           .worklist.IWorkListTable"
+      provides="z3c.table.interfaces.IColumn"
+      factory=".worklist.LastActivityByColumn"
+      />
+
+  <adapter
+      name="lastactivity"
+      for="*
+           quotationtool.skin.interfaces.IQuotationtoolBrowserLayer
+           .worklist.IWorkListTable"
+      provides="z3c.table.interfaces.IColumn"
+      factory=".worklist.LastActivityColumn"
+      />
+
+
+
+</configure>
