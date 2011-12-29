@@ -4,8 +4,12 @@ from persistent import Persistent
 from zope.location.location import Location
 from zope.wfmc.interfaces import IWorkItem, IParticipant, ProcessError
 from zope.app.component.hooks import getSite
-from zope.location.interfaces import IContained
-from zope.proxy import removeAllProxies
+from zope.intid.interfaces import IIntIds
+from z3c.indexer.interfaces import IIndex, IIndexer
+from z3c.indexer.query import AnyOf
+from z3c.indexer.search import SearchQuery
+from z3c.indexer.indexer import ValueIndexer
+from zope.intid.interfaces import IIntIdAddedEvent, IIntIdRemovedEvent
 
 from quotationtool.workflow import interfaces
 from quotationtool.workflow.interfaces import _
@@ -36,7 +40,7 @@ class WorkItemBase(Persistent, Location):
             name=self.worklist,
             context=getSite())
         worklist.remove(item)
-        
+
 
 class ContributorWorkItem(WorkItemBase):
 
@@ -71,44 +75,85 @@ class EditorialReviewWorkItem(WorkItemBase):
         self.participant.activity.workItemFinished(self, publish)
 
 
-class RemoveWorkItem(WorkItemBase):
-    """ Application to remove a database item."""
+class WorkflowInfo(object):
+    """ Adapter that offers information about the workflow process
+    which a work item is part of."""
 
-    worklist = 'editorialreview'
+    zope.interface.implements(interfaces.IWorkflowInfo)
+    zope.component.adapts(IWorkItem)
 
-    schema = interfaces.IRemoveSchema
+    def __init__(self, context):
+        self.context = context
+        self.participant = getattr(context, 'participant', None)
+        self.activity = getattr(self.participant, 'activity', None)
+        self.process = getattr(self.activity, 'process', None)
+        self.process_definition = getattr(self.process, 'definition', None)
 
-    def start(self):
-        obj = getattr(self.participant.activity.process.workflowRelevantData, 'object')
-        # assert that object is removable, i.e. implements IRemovable
-        if not interfaces.IRemovable.providedBy(obj):
-            raise ProcessError(_(
-                    'iremovable-not-provided',
-                    u"Unremovable Object. (IRemovable interface not provided.)"
-                    ))
-        #TODO: add some more ways to remove the object
-        if not (IContained.providedBy(obj) or 1==2):
-            raise ProcessError(_(
-                    'wfmc-remove-unremovable',
-                    u"Unremovable Object. (Could not determine a way who to remove item.)"
-                    ))
-        self._appendToWorkList(self)
-            
-    def finish(self, remove):
-        self.schema['remove'].validate(remove)
+    @property
+    def process_name(self):
+        return getattr(self.process_definition, '__name__', _(u"Unkown"))
+        
 
-        if remove=='remove':
-            obj = getattr(self.participant.activity.process.workflowRelevantData, 'object')
-            # for contained item del it on container
-            if IContained.providedBy(obj):
-                container = obj.__parent__
-                del container[obj.__name__]
-            else:
-                pass
-        #TODO: add some more ways to remove the object
+class SimilarWorkItemsMixin(object):
+    """ See ISimilarWorkItems"""
 
-        # we remove the work item on remove=='postpone', too. It gets
-        # added by start again.
-        self._removeFromWorkList(self)
-        self.participant.activity.workItemFinished(self, remove)
+    zope.interface.implements(interfaces.ISimilarWorkItems)
+
+    oid_attributes = ()
+
+    def getSimilarWorkItems(self):
+        ids = []
+        intids = zope.component.getUtility(IIntIds, context=self)
+        for attr in self.oid_attributes:
+            intid = intids.queryId(getattr(self, attr), None)
+            if intid is not None:
+                ids.append(intid)
+        #raise Exception(ids)
+        query = SearchQuery(AnyOf('workflow-relevant-oids', ids))
+        res = query.apply()
+        #raise Exception(res)
+        for intid in res:
+            if intid != intids.getId(self):
+                yield intids.getObject(intid)
+
+
+class OIDsIndexer(ValueIndexer):
+    """ Returns object ids of the object under workflow control."""
+
+    #zope.component.adapts(interfaces.ISimilarWorkItems)    
+    #zope.component.adapts(IWorkItem)
+
+    indexName = 'workflow-relevant-oids'
+
+    @property
+    def value(self):
+        ids = []
+        intids = zope.component.getUtility(IIntIds, context=self.context)
+        for attr in self.context.oid_attributes:
+            i = intids.queryId(getattr(self.context, attr, None))
+            if i:
+                ids.append(i)
+        return ids
+
+    def doIndexOFF(self):
+        raise Exception
+
+
+@zope.component.adapter(IIntIdAddedEvent)
+def indexOIDs(event):
+    indexer = zope.component.queryAdapter(
+        event.object, IIndexer, 
+        name='workflow-relevant-oids')
+    if indexer:
+        indexer.doIndex()
+
+
+@zope.component.adapter(IIntIdRemovedEvent)
+def unindexOIDs(event):
+    indexer = zope.component.queryAdapter(
+        event.object, IIndexer, 
+        name='workflow-relevant-oids')
+    if indexer:
+        indexer.doUnIndex()
+
 

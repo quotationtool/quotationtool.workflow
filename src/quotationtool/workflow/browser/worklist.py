@@ -1,12 +1,16 @@
 import zope.component
 from zope.interface import implements, Interface
-from z3c.table import table, column
+from z3c.table import table, column, value
 from z3c.table.interfaces import ITable
 from z3c.pagelet.browser import BrowserPagelet
 from zope.authentication.interfaces import IAuthentication
 from zope.dublincore.interfaces import IZopeDublinCore
+from zope.publisher.browser import BrowserView
+from zope.i18n import translate
+from zope.app.pagetemplate.viewpagetemplatefile import ViewPageTemplateFile
 
 from quotationtool.workflow.interfaces import _
+from quotationtool.workflow import interfaces
 
 
 class ListWorkLists(BrowserPagelet):
@@ -14,6 +18,19 @@ class ListWorkLists(BrowserPagelet):
 
     def lists(self):
         return self.context.values()
+
+class WorkFlowContainerLabel(BrowserView):
+    """ A label for the workflow container."""
+
+    def __call__(self):
+        return _(u"Workflow")
+
+
+class WorkListLabel(BrowserView):
+    """ A label for the workflow container."""
+
+    def __call__(self):
+        return getattr(IZopeDublinCore(self.context, None), 'title', _(u"Work list"))
 
 
 class IWorkListTable(ITable):
@@ -41,6 +58,32 @@ class WorkListTable(table.Table, BrowserPagelet):
         return getattr(IZopeDublinCore(self.context, None), 'description', u'Unkown')
 
 
+class SimilarWorkItemsTable(table.Table, BrowserView):
+    
+    zope.interface.implements(IWorkListTable)
+
+    template = ViewPageTemplateFile('similar_work_items.pt')
+
+    cssClasses = {
+        'table': u'container-listing',
+        'thead': u"head",
+        }
+    cssClassEven = u"even"
+    cssClassOdd = u"odd"
+
+    def __call__(self):
+        self.update()
+        return self.template()
+
+
+class SimilarWorkItemsValues(value.ValuesMixin):
+
+    @property
+    def values(self):
+        similars = interfaces.ISimilarWorkItems(self.context)
+        return similars.getSimilarWorkItems()
+
+
 class ISortingColumn(Interface):
     """ A sorting column."""
 
@@ -53,9 +96,7 @@ class ProcessColumn(column.Column):
     weight = 100
 
     def renderCell(self, item):
-        proc = item.participant.activity.process
-        definition = getattr(proc.definition)
-        return definition.__name__
+        return interfaces.IWorkflowInfo(item).process_name
 
 
 class WorkItemColumn(column.Column):
@@ -72,27 +113,31 @@ class WorkItemColumn(column.Column):
         view = zope.component.getMultiAdapter(
             (item, self.request),
             name='label')
-        return view()
+        rc = view()
+        try:
+            rc = translate(rc, context=self.request)
+        except Exception:
+            pass
+        return rc
 
 
 class ContributorColumn(column.Column):
 
     implements(ISortingColumn)
 
-    header = _('contributor-column-header', u"Contributor")
+    header = _('contributor-column-header', u"Started By")
     weight = 200
 
     def renderCell(self, item):
-        contributor = getattr(item.participant.activity.process.workflowRelevantData, 'contributor', u'Unkown')
+        contributor = getattr(item, 'contributor', u'Unkown')
         pau = zope.component.queryUtility(
             IAuthentication,
             context = self.context
             )
-        if pau is not None:
-            try:
-                contributor = pau.getPrincipal(list(contributor)[0]).title
-            except Exception:
-                pass
+        try:
+            contributor = pau.getPrincipal(contributor).title
+        except Exception:
+            pass
         return contributor
 
 

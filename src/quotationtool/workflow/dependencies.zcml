@@ -11,6 +11,7 @@
   <include package="zope.site"/>
   <include package="zope.security"/>
   <include package="zope.annotation"/>
+  <include package="zope.intid"/>
   
   <include package="quotationtool.security"/>
   <include package="quotationtool.site"/>

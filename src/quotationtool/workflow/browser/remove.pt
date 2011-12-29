@@ -1,0 +1,38 @@
+<metal:macro use-macro="macro:form" i18n:domain="quotationtool">
+  
+  <metal:block fill-slot="extra-info">
+    <div class="form-info"
+         tal:condition="view/info|nothing">
+      <span class="form-info-label" 
+            i18n:translate="form-info">Note: </span>
+      <span i18n:translate=""
+         tal:content="structure view/info|nothing">info</span>
+    </div>
+    <div tal:condition="python:len(list(context.getSimilarWorkItems()))>0" 
+	 class="similar-work-items">
+      <p i18n:translate="">
+	<b>Attention:</b> The object asked to be removed is relevant for
+	<span i18n:name="COUNT"
+	tal:content="python:len(list(context.getSimilarWorkItems()))"
+	>5</span> other workflow processes, too. You will not be able
+	to remove it before these other processes are finished.
+      </p>
+      <div tal:content="structure context/@@similar_work_items"/>
+    </div>
+    <div class="remove-relations">
+      <p i18n:translate="">
+	<b>Attention:</b> Make sure that there are no relations from
+	other items to this item!!!
+      </p>
+    </div>
+    <div class="object-details">
+      <h3 i18n:translate="">Item to be removed:</h3>
+      <div tal:content="structure context/object_/@@list"/>
+    </div>
+  </metal:block>
+
+  <metal:slot fill-slot="main">
+    <metal:macro use-macro="macro:widget-rows"/>
+  </metal:slot>
+ 
+</metal:macro>

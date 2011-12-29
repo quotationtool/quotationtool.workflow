@@ -1,0 +1,7 @@
+<div i18n:domain="quotationtool">
+
+  <div class="batch" tal:content="structure view/renderBatch"/>
+
+  <div tal:replace="structure view/renderTable"/>
+
+</div>

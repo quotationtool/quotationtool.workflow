@@ -1,0 +1,12 @@
+<div class="error" i18n:domain="quotationtool">
+  <h3 i18n:translate="process-error">A error occurred executing the workflow!</h3>
+  <br/>
+  <div tal:repeat="part context">
+    <b tal:content="part">Error message</b>
+  </div>
+  <div>
+    <a href="javascript:history.back(1);" i18n:translate="sys-error-try-again">
+      Go back.
+    </a>
+  </div>
+</div>

@@ -2,15 +2,28 @@
 
   <h1 i18n:translate="">Workflow</h1>
 
+  <p i18n:translate="">
+    Adding and removing items to the database is controled by
+    'workflow processes'. It's the job of the site's editors to review
+    the added items and to decide whether to publish or reject.
+  </p>
+
+  <p i18n:translate="">
+    Workflow is arranged to lists of work items according to different
+    roles.
+  </p>
+
   <h3 i18n:translate="">Work Lists</h3>
 
-  <div tal:repeat="list view/lists">
+  <div class="worklist-info" tal:repeat="list view/lists">
 
     <div class="worklist-title">
       <a class="internal"
 	  href="editorialreview"
 	  tal:content="list/zope:title"
 	  tal:attributes="href list/@@absolute_url">Editorial Review</a>
+      &mdash;
+      <span class="workitems-count" tal:content="python:len(list)">5</span>
     </div>
     <div class="worklist-description"
 	 tal:content="list/zope:description">

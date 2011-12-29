@@ -3,6 +3,14 @@
     xmlns:z3c="http://namespaces.zope.org/z3c"
     >
 
+  <view
+      for="..remove.RemoveWorkItem"
+      name="label"
+      type="quotationtool.skin.interfaces.IQuotationtoolBrowserLayer"
+      factory=".remove.RemoveWorkItemLabel"
+      permission="zope.View"
+      />
+
   <z3c:pagelet
       for="..interfaces.IRemovable"
       name="remove.html"
@@ -25,10 +33,15 @@
       />
 
   <z3c:pagelet
-      for="..workitem.RemoveWorkItem"
+      for="..remove.RemoveWorkItem"
       name="index.html"
       class=".remove.RemoveEditorialReview"
       permission="quotationtool.workflow.DoEditorialReview"
+      layer="quotationtool.skin.interfaces.IQuotationtoolBrowserLayer"
+      />
+  <z3c:template
+      for=".remove.RemoveEditorialReview"
+      template="remove.pt"
       layer="quotationtool.skin.interfaces.IQuotationtoolBrowserLayer"
       />
 

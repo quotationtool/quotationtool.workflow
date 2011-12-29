@@ -16,6 +16,22 @@
       layer="quotationtool.skin.interfaces.IQuotationtoolBrowserLayer"
       />
 
+  <view
+      for="..interfaces.IWorkFlowContainer"
+      name="label"
+      factory=".worklist.WorkFlowContainerLabel"
+      type="quotationtool.skin.interfaces.IQuotationtoolBrowserLayer"
+      permission="zope.View"
+      />
+
+  <view
+      for="..interfaces.IWorkList"
+      name="label"
+      factory=".worklist.WorkListLabel"
+      type="quotationtool.skin.interfaces.IQuotationtoolBrowserLayer"
+      permission="zope.View"
+      />
+
   <z3c:pagelet
       for="..interfaces.IWorkList"
       name="index.html"
@@ -29,6 +45,22 @@
       layer="quotationtool.skin.interfaces.IQuotationtoolBrowserLayer"
       />
 
+  <view
+      for="zope.wfmc.interfaces.IWorkItem"
+      name="similar_work_items"
+      factory=".worklist.SimilarWorkItemsTable"
+      type="quotationtool.skin.interfaces.IQuotationtoolBrowserLayer"
+      permission="zope.View"
+      />
+  <adapter
+      for="zope.wfmc.interfaces.IWorkItem
+	   *
+	   .worklist.SimilarWorkItemsTable"
+      provides="z3c.table.interfaces.IValues"
+      factory=".worklist.SimilarWorkItemsValues"
+      />
+      
+
   <adapter
       for="*
            quotationtool.skin.interfaces.IQuotationtoolBrowserLayer
@@ -38,14 +70,14 @@
       factory="quotationtool.skin.browser.table.SortingColumnHeader"
       />
 
-  <!--adapter
+  <adapter
       name="process"
       for="*
            quotationtool.skin.interfaces.IQuotationtoolBrowserLayer
            .worklist.IWorkListTable"
       provides="z3c.table.interfaces.IColumn"
       factory=".worklist.ProcessColumn"
-      /-->
+      />
 
   <adapter
       name="workitem"
@@ -56,14 +88,14 @@
       factory=".worklist.WorkItemColumn"
       />
 
-  <!--adapter
+  <adapter
       name="contributor"
       for="*
            quotationtool.skin.interfaces.IQuotationtoolBrowserLayer
            .worklist.IWorkListTable"
       provides="z3c.table.interfaces.IColumn"
       factory=".worklist.ContributorColumn"
-      /-->
+      />
 
   <adapter
       name="lastactivityby"

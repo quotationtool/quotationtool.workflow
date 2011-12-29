@@ -90,14 +90,16 @@ workflow history itself or an object adaptable to IWorkflowHistory.
 The start method for quotationtool.remove process takes formal
 parameters:
 
+The start method takes formal parameters:
 1) The user-id of the user who asks the object to be removed.
-2) The object which is asked to be removed. It is expected to 
-   implement zope.location.interfaces.IContained.
+2) The time of the process is started.
 3) The workflow history. 
-
+4) The object which is asked to be removed. It is expected to 
+   implement zope.location.interfaces.IContained.
 
 >>> proc = pd()
->>> proc.start('chris', foo, history)
+>>> import datetime
+>>> proc.start('chris', datetime.datetime.now(), history, foo)
 <...
 ProcessStarted(Process('quotationtool.remove'))...
 Transition(None, Activity('quotationtool.remove.start'))...
@@ -111,7 +113,7 @@ ActivityStarted(Activity('quotationtool.remove.review'))...
 
 >>> item = editorialreview_items.pop()
 >>> item
-<quotationtool.workflow.workitem.RemoveWorkItem object at 0x...>
+<quotationtool.workflow.remove.RemoveWorkItem object at 0x...>
 
 >>> item.finish('postpone')
 <...
@@ -129,17 +131,14 @@ ActivityStarted(Activity('quotationtool.remove.review'))...
 <...
 WorkItemFinished(u'remove')...
 ActivityFinished(Activity('quotationtool.remove.review'))...
-Transition(Activity('quotationtool.remove.review'), Activity('quotationtool.remove.delete'))...
-ActivityStarted(Activity('quotationtool.remove.delete'))...
-ActivityFinished(Activity('quotationtool.remove.delete'))...
-Transition(Activity('quotationtool.remove.delete'), Activity('quotationtool.remove.remove'))...
+Transition(Activity('quotationtool.remove.review'), Activity('quotationtool.remove.remove'))...
 ActivityStarted(Activity('quotationtool.remove.remove'))...
 ActivityFinished(Activity('quotationtool.remove.remove'))...
 ProcessFinished(Process('quotationtool.remove'))...
 
 
 >>> len(history)
-19
+16
 
 >>> for notation in history():
 ...     print(notation)
@@ -154,9 +153,6 @@ ProcessFinished(Process('quotationtool.remove'))...
     transition-notation
     activity-started-notation
     workitem-finished-notation
-    activity-finished-notation
-    transition-notation
-    activity-started-notation
     activity-finished-notation
     transition-notation
     activity-started-notation
@@ -177,10 +173,7 @@ ProcessFinished(Process('quotationtool.remove'))...
     ActivityStarted(Activity('quotationtool.remove.review'))
     WorkItemFinished(u'remove')
     ActivityFinished(Activity('quotationtool.remove.review'))
-    Transition(Activity('quotationtool.remove.review'), Activity('quotationtool.remove.delete'))
-    ActivityStarted(Activity('quotationtool.remove.delete'))
-    ActivityFinished(Activity('quotationtool.remove.delete'))
-    Transition(Activity('quotationtool.remove.delete'), Activity('quotationtool.remove.remove'))
+    Transition(Activity('quotationtool.remove.review'), Activity('quotationtool.remove.remove'))
     ActivityStarted(Activity('quotationtool.remove.remove'))
     ActivityFinished(Activity('quotationtool.remove.remove'))
     process-finished-notation

@@ -1,0 +1,26 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:z3c="http://namespaces.zope.org/z3c">
+
+  <view
+      name="label"
+      for="zope.wfmc.interfaces.ProcessError"
+      factory=".exception.ProcessErrorLabel"
+      type="quotationtool.skin.interfaces.IQuotationtoolBrowserLayer"
+      permission="zope.View"
+      />
+
+  <z3c:pagelet
+      name="index.html"
+      for="zope.wfmc.interfaces.ProcessError"
+      class=".exception.ProcessErrorPagelet"
+      layer="quotationtool.skin.interfaces.IQuotationtoolBrowserLayer"
+      permission="zope.View"
+      />
+  <z3c:template
+      for=".exception.ProcessErrorPagelet"
+      layer="quotationtool.skin.interfaces.IQuotationtoolBrowserLayer"
+      template="processerror.pt"
+      />
+
+</configure>

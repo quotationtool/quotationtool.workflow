@@ -62,6 +62,9 @@ setup(
         'zope.publisher',
         'zope.app.schema',
         'zope.container',
+        'zope.wfmc',
+        'zope.app.wfmc',
+        'z3c.indexer',
 
         'zope.app.pagetemplate',
         'zope.viewlet',
@@ -76,8 +79,6 @@ setup(
         'z3c.menu.ready2go',
         'zc.resourcelibrary',
         'zope.contentprovider',
-        'zope.wfmc',
-        'zope.app.wfmc',
 
         'quotationtool.site',
         'quotationtool.security',

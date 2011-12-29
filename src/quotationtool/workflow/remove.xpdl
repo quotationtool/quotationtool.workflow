@@ -23,62 +23,6 @@
             <xpdl:Description>Automatic</xpdl:Description>
         </xpdl:Participant>
     </xpdl:Participants>
-    <xpdl:Applications>
-        <xpdl:Application Id="edit" Name="Edit">
-            <xpdl:Description>Edit application has the out-parameter 'safe' which decides if the item is safed as draft, goes to trash or is finished (goes to next acticity).</xpdl:Description>
-            <xpdl:FormalParameters>
-                <xpdl:FormalParameter Id="save" IsArray="false" Mode="OUT" Name="Save Option">
-                    <xpdl:DataType>
-                        <xpdl:BasicType Type="STRING"/>
-                    </xpdl:DataType>
-                    <xpdl:Description>Can be 'finish', 'draft' or 'trash'.</xpdl:Description>
-                </xpdl:FormalParameter>
-            </xpdl:FormalParameters>
-        </xpdl:Application>
-        <xpdl:Application Id="review" Name="Editorial Review">
-            <xpdl:Description>Editorial review of workflow item. Has an out-parameter 'publish' which decides if published, rejected or decision is postponed.</xpdl:Description>
-            <xpdl:FormalParameters>
-                <xpdl:FormalParameter Id="publish" IsArray="false" Mode="OUT" Name="Publish">
-                    <xpdl:DataType>
-                        <xpdl:BasicType Type="STRING"/>
-                    </xpdl:DataType>
-                    <xpdl:InitialValue>publish</xpdl:InitialValue>
-                    <xpdl:Description>Can either be 'publish', 'reject' or 'postpone'.</xpdl:Description>
-                </xpdl:FormalParameter>
-            </xpdl:FormalParameters>
-        </xpdl:Application>
-        <xpdl:Application Id="technicalreview" Name="Technical Review">
-            <xpdl:Description>Technical review of workflow item. Has an out-parameter 'correctness' which decides if technically ok, rejected or decision is postponed.</xpdl:Description>
-            <xpdl:FormalParameters>
-                <xpdl:FormalParameter Id="correctness" IsArray="false" Mode="OUT" Name="correctness">
-                    <xpdl:DataType>
-                        <xpdl:BasicType Type="STRING"/>
-                    </xpdl:DataType>
-                    <xpdl:InitialValue>publish</xpdl:InitialValue>
-                    <xpdl:Description>Can either be 'ok', 'reject' or 'postpone'.</xpdl:Description>
-                </xpdl:FormalParameter>
-            </xpdl:FormalParameters>
-        </xpdl:Application>
-    </xpdl:Applications>
-    <xpdl:DataFields>
-        <xpdl:DataField Id="publish" IsArray="false" Name="Publish">
-            <xpdl:DataType>
-                <xpdl:BasicType Type="STRING"/>
-            </xpdl:DataType>
-            <xpdl:InitialValue>publish</xpdl:InitialValue>
-        </xpdl:DataField>
-        <xpdl:DataField Id="save" IsArray="false" Name="Save Option">
-            <xpdl:DataType>
-                <xpdl:BasicType Type="STRING"/>
-            </xpdl:DataType>
-            <xpdl:InitialValue>finish</xpdl:InitialValue>
-        </xpdl:DataField>
-        <xpdl:DataField Id="correctness" IsArray="false" Name="correctness">
-            <xpdl:DataType>
-                <xpdl:BasicType Type="STRING"/>
-            </xpdl:DataType>
-        </xpdl:DataField>
-    </xpdl:DataFields>
     <xpdl:Pools>
         <xpdl:Pool BoundaryVisible="true" Id="quotationtool_pool1" MainPool="true" Name="Remove" Orientation="HORIZONTAL" Process="remove">
             <xpdl:Lanes>
@@ -121,17 +65,23 @@
                     </xpdl:DataType>
                     <xpdl:Description>The user who queries for removing the item.</xpdl:Description>
                 </xpdl:FormalParameter>
-                <xpdl:FormalParameter Id="object" IsArray="false" Mode="INOUT" Name="Object">
+                <xpdl:FormalParameter Id="starttime" IsArray="false" Mode="IN" Name="Starttime">
                     <xpdl:DataType>
                         <xpdl:BasicType Type="STRING"/>
                     </xpdl:DataType>
-                    <xpdl:Description>The object asked to be removed.</xpdl:Description>
+                    <xpdl:Description>Timestamp when the workflow process was started.</xpdl:Description>
                 </xpdl:FormalParameter>
-                <xpdl:FormalParameter Id="history" IsArray="false" Mode="INOUT" Name="History">
+                <xpdl:FormalParameter Id="history" IsArray="false" Mode="IN" Name="History">
                     <xpdl:DataType>
                         <xpdl:BasicType Type="STRING"/>
                     </xpdl:DataType>
                     <xpdl:Description>Workflow history of the object asked to be removed.</xpdl:Description>
+                </xpdl:FormalParameter>
+                <xpdl:FormalParameter Id="object" IsArray="false" Mode="IN" Name="Object">
+                    <xpdl:DataType>
+                        <xpdl:BasicType Type="STRING"/>
+                    </xpdl:DataType>
+                    <xpdl:Description>The object asked to be removed.</xpdl:Description>
                 </xpdl:FormalParameter>
             </xpdl:FormalParameters>
             <xpdl:Applications>
@@ -142,13 +92,49 @@
                                 <xpdl:BasicType Type="STRING"/>
                             </xpdl:DataType>
                         </xpdl:FormalParameter>
+                        <xpdl:FormalParameter Id="contributor" IsArray="false" Mode="IN" Name="Contributor">
+                            <xpdl:DataType>
+                                <xpdl:BasicType Type="STRING"/>
+                            </xpdl:DataType>
+                        </xpdl:FormalParameter>
+                        <xpdl:FormalParameter Id="starttime" IsArray="false" Mode="IN" Name="Starttime">
+                            <xpdl:DataType>
+                                <xpdl:BasicType Type="STRING"/>
+                            </xpdl:DataType>
+                        </xpdl:FormalParameter>
+                        <xpdl:FormalParameter Id="history" IsArray="false" Mode="INOUT" Name="History">
+                            <xpdl:DataType>
+                                <xpdl:BasicType Type="STRING"/>
+                            </xpdl:DataType>
+                        </xpdl:FormalParameter>
+                        <xpdl:FormalParameter Id="object" IsArray="false" Mode="INOUT" Name="Object">
+                            <xpdl:DataType>
+                                <xpdl:BasicType Type="STRING"/>
+                            </xpdl:DataType>
+                        </xpdl:FormalParameter>
                     </xpdl:FormalParameters>
                 </xpdl:Application>
             </xpdl:Applications>
             <xpdl:DataFields>
-                <xpdl:DataField Id="relations" IsArray="false" Name="Relations">
+                <xpdl:DataField Id="contributor" IsArray="false" Name="Contributor">
                     <xpdl:DataType>
-                        <xpdl:BasicType Type="INTEGER"/>
+                        <xpdl:BasicType Type="STRING"/>
+                    </xpdl:DataType>
+                </xpdl:DataField>
+                <xpdl:DataField Id="starttime" IsArray="false" Name="Starttime">
+                    <xpdl:DataType>
+                        <xpdl:BasicType Type="STRING"/>
+                    </xpdl:DataType>
+                    <xpdl:Description>Timestamp when process is started.</xpdl:Description>
+                </xpdl:DataField>
+                <xpdl:DataField Id="history" IsArray="false" Name="History">
+                    <xpdl:DataType>
+                        <xpdl:BasicType Type="STRING"/>
+                    </xpdl:DataType>
+                </xpdl:DataField>
+                <xpdl:DataField Id="object" IsArray="false" Name="Object">
+                    <xpdl:DataType>
+                        <xpdl:BasicType Type="STRING"/>
                     </xpdl:DataType>
                 </xpdl:DataField>
                 <xpdl:DataField Id="remove" IsArray="false" Name="remove">
@@ -156,6 +142,11 @@
                         <xpdl:BasicType Type="STRING"/>
                     </xpdl:DataType>
                     <xpdl:Description>Can ether be remove, reject or postpone</xpdl:Description>
+                </xpdl:DataField>
+                <xpdl:DataField Id="relations" IsArray="false" Name="Relations">
+                    <xpdl:DataType>
+                        <xpdl:BasicType Type="INTEGER"/>
+                    </xpdl:DataType>
                 </xpdl:DataField>
             </xpdl:DataFields>
             <xpdl:Activities>
@@ -175,6 +166,10 @@
                             <xpdl:TaskApplication Id="remove">
                                 <xpdl:ActualParameters>
                                     <xpdl:ActualParameter>remove</xpdl:ActualParameter>
+                                    <xpdl:ActualParameter>contributor</xpdl:ActualParameter>
+                                    <xpdl:ActualParameter>starttime</xpdl:ActualParameter>
+                                    <xpdl:ActualParameter>history</xpdl:ActualParameter>
+                                    <xpdl:ActualParameter>object</xpdl:ActualParameter>
                                 </xpdl:ActualParameters>
                             </xpdl:TaskApplication>
                         </xpdl:Task>
@@ -220,23 +215,6 @@
                         </xpdl:NodeGraphicsInfo>
                     </xpdl:NodeGraphicsInfos>
                 </xpdl:Activity>
-                <xpdl:Activity FinishMode="Automatic" Id="delete" Name="Delete" StartMode="Automatic">
-                    <xpdl:Implementation>
-                        <xpdl:Task>
-                            <xpdl:TaskScript>
-                                <xpdl:Script ScriptGrammar="c" ScriptType="a" ScriptVersion="b"/>
-                            </xpdl:TaskScript>
-                        </xpdl:Task>
-                    </xpdl:Implementation>
-                    <xpdl:Performers>
-                        <xpdl:Performer/>
-                    </xpdl:Performers>
-                    <xpdl:NodeGraphicsInfos>
-                        <xpdl:NodeGraphicsInfo BorderColor="0,0,0" FillColor="255,255,204" Height="60" IsVisible="true" LaneId="quotationtool_pool1_lan3" ToolId="JaWE" Width="90">
-                            <xpdl:Coordinates XCoordinate="531" YCoordinate="177"/>
-                        </xpdl:NodeGraphicsInfo>
-                    </xpdl:NodeGraphicsInfos>
-                </xpdl:Activity>
             </xpdl:Activities>
             <xpdl:Transitions>
                 <xpdl:Transition From="start" Id="remove_tra1" To="review">
@@ -253,7 +231,7 @@
                         </xpdl:ConnectorGraphicsInfo>
                     </xpdl:ConnectorGraphicsInfos>
                 </xpdl:Transition>
-                <xpdl:Transition From="review" Id="remove_tra3" To="delete">
+                <xpdl:Transition From="review" Id="remove_tra3" To="remove">
                     <xpdl:Condition Type="CONDITION">remove == 'remove'</xpdl:Condition>
                     <xpdl:ConnectorGraphicsInfos>
                         <xpdl:ConnectorGraphicsInfo FillColor="0,0,0" IsVisible="true" Style="NO_ROUTING_SPLINE" ToolId="JaWE"/>
@@ -261,11 +239,6 @@
                 </xpdl:Transition>
                 <xpdl:Transition From="review" Id="remove_tra4" To="reject">
                     <xpdl:Condition Type="CONDITION">remove == 'reject'</xpdl:Condition>
-                    <xpdl:ConnectorGraphicsInfos>
-                        <xpdl:ConnectorGraphicsInfo FillColor="0,0,0" IsVisible="true" Style="NO_ROUTING_SPLINE" ToolId="JaWE"/>
-                    </xpdl:ConnectorGraphicsInfos>
-                </xpdl:Transition>
-                <xpdl:Transition From="delete" Id="remove_tra5" To="remove">
                     <xpdl:ConnectorGraphicsInfos>
                         <xpdl:ConnectorGraphicsInfo FillColor="0,0,0" IsVisible="true" Style="NO_ROUTING_SPLINE" ToolId="JaWE"/>
                     </xpdl:ConnectorGraphicsInfos>

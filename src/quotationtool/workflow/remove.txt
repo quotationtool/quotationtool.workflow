@@ -61,13 +61,16 @@ True
 1
 
 >>> proc = pd()
+>>> import datetime
 
 The start method takes formal parameters:
 1) The user-id of the user who asks the object to be removed.
-2) The object which is asked to be removed. It is expected to implement zope.location.interfaces.IContained.
+2) The time of the process is started.
 3) The workflow history. 
+4) The object which is asked to be removed. It is expected to 
+   implement zope.location.interfaces.IContained.
 
->>> proc.start('chris', foo, None)
+>>> proc.start('chris', datetime.datetime.now(), None, foo)
 ProcessStarted(Process('quotationtool.remove'))
 Transition(None, Activity('quotationtool.remove.start'))
 ActivityStarted(Activity('quotationtool.remove.start'))
@@ -78,7 +81,7 @@ ActivityStarted(Activity('quotationtool.remove.review'))
 
 >>> item = editorialreview_items.pop()
 >>> item
-<quotationtool.workflow.workitem.RemoveWorkItem object at 0x...>
+<quotationtool.workflow.remove.RemoveWorkItem object at 0x...>
 
 >>> item.finish('postpone')
 <...
@@ -93,14 +96,10 @@ ActivityStarted(Activity('quotationtool.remove.review'))
 
 >>> item = editorialreview_items.pop()
 >>> item.finish('remove')
-<zope.lifecycleevent.ObjectRemovedEvent object at 0x...>
-<zope.container.contained.ContainerModifiedEvent object at 0x...>
+<...
 WorkItemFinished(u'remove')
 ActivityFinished(Activity('quotationtool.remove.review'))
-Transition(Activity('quotationtool.remove.review'), Activity('quotationtool.remove.delete'))
-ActivityStarted(Activity('quotationtool.remove.delete'))
-ActivityFinished(Activity('quotationtool.remove.delete'))
-Transition(Activity('quotationtool.remove.delete'), Activity('quotationtool.remove.remove'))
+Transition(Activity('quotationtool.remove.review'), Activity('quotationtool.remove.remove'))
 ActivityStarted(Activity('quotationtool.remove.remove'))
 ActivityFinished(Activity('quotationtool.remove.remove'))
 ProcessFinished(Process('quotationtool.remove'))
@@ -113,4 +112,54 @@ ProcessFinished(Process('quotationtool.remove'))
 Remove simple logger from subscriber list. 
 
 >>> zope.event.subscribers.remove(log_workflow)
+
+
+Restrictions
+~~~~~~~~~~~~
+
+If there is an other work item which takes the object to be removed as
+workflow relevant data, the removal will not be possible. For removal
+would break these other workflow processes. 
+
+>>> container['bar'] = bar = Foo()
+
+>>> from zope.intid.interfaces import IIntIds
+>>> intids = zope.component.getUtility(IIntIds, name='')
+>>> barid = intids.queryId(bar)
+
+>>> isinstance(barid, int)
+True
+
+>>> proc1 = pd()
+>>> proc1.start('chris', datetime.datetime.now(), None, bar)
+
+>>> proc2 = pd()
+>>> proc2.start('bob', datetime.datetime.now(), None, bar)
+
+>>> item = editorialreview_items.pop()
+
+>>> item.contributor
+'bob'
+
+>>> item.finish('remove')
+Traceback (most recent call last):
+...
+ProcessError: wfmc-remove-still-similar
+
+We can learn more using the ISimilarWorkItems interface:
+
+>>> from quotationtool.workflow.interfaces import ISimilarWorkItems
+>>> ISimilarWorkItems.providedBy(item)
+True
+
+>>> list(item.getSimilarWorkItems())
+[<quotationtool.workflow.remove.RemoveWorkItem object at 0x...>]
+
+
+There is also in indexer that we want to test:
+
+>>> from z3c.indexer.interfaces import IIndexer
+>>> indexer = zope.component.getAdapter(item, IIndexer, name='workflow-relevant-oids')
+>>> indexer.value == [barid]
+True
 

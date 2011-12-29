@@ -22,6 +22,24 @@ def zcml(s):
     context = xmlconfig.file('meta.zcml', package=zope.app.wfmc)
     xmlconfig.string(s, context)
 
+def setUpOIDs(test):
+    """ Test setup with intids utility and setindex for object ids of
+    workflow relevant database items."""
+    setUpZCML(test)
+    from testing import DummyIntIds
+    from zope.intid.interfaces import IIntIds
+    if zope.component.queryUtility(IIntIds):
+        raise Exception
+    intids = DummyIntIds()
+    zope.component.provideUtility(intids, IIntIds)
+    from z3c.indexer.index import SetIndex
+    from z3c.indexer.interfaces import IIndex
+    oids = SetIndex()
+    zope.component.provideUtility(oids, IIndex, name='workflow-relevant-oids')
+    from testing import addIntIdSubscriber, removeIntIdSubscriber
+    zope.component.provideHandler(addIntIdSubscriber)
+    zope.component.provideHandler(removeIntIdSubscriber)
+
 def setUpArticle(test):
     placelesssetup.setUp(test)
     test.globs['this_directory'] = os.path.dirname(__file__)
@@ -50,6 +68,13 @@ class SiteCreationTests(PlacelessSetup, unittest.TestCase):
         self.assertTrue(isinstance(site['workflow']['technicalreview'], WorkList))
         self.assertTrue(isinstance(site['workflow']['script'], WorkList))
 
+    def test_Indices(self):
+        from z3c.indexer.interfaces import IIndex
+        from quotationtool.site.site import QuotationtoolSite
+        self.root_folder['quotationtool'] = site = QuotationtoolSite()
+        oids = zope.component.queryUtility(IIndex, name='workflow-relevant-oids', context=site)
+        self.assertTrue(oids is not None)
+        self.assertTrue(oids is site.getSiteManager()['default']['workflow-relevant-oids'])
 
 def test_suite():
     return unittest.TestSuite((
@@ -59,11 +84,11 @@ def test_suite():
                                  tearDown = tearDown,
                                  optionflags=_flags),
             doctest.DocFileSuite('remove.txt',
-                                 setUp = setUpZCML,
+                                 setUp = setUpOIDs,
                                  tearDown = tearDown,
                                  optionflags=_flags),
             doctest.DocFileSuite('history.txt',
-                                 setUp = setUpZCML,
+                                 setUp = setUpOIDs,
                                  tearDown = tearDown,
                                  optionflags=_flags),
             ))

@@ -31,6 +31,32 @@ class IWorkList(zope.interface.Interface):
         """ Remove obj from list of workflow items."""
 
 
+class ISimilarWorkItems(zope.interface.Interface):
+    """ There would be system errors if a database item was
+    removed by one workflow process but was still under control of
+    another workflow process. So we need some tool to be aware of the
+    database items a work item/a workflow process deals with. 
+
+    This is done by indexing the intids of the database items relevant
+    for a work item. There is an indexer registered for workitems that
+    implement ISimilarWorkItems and that gets the intids by means of
+    'oid_attributes'.
+
+    Similar work items (== items that work on the same database items)
+    can the be found by calling getSimilarWorkItems(). This method
+    simply queries the index."""
+
+    oid_attributes = zope.schema.Tuple(
+        title=_(u"Object Id Attributes"),
+        description=_(u"Names of attributes that hold database items relevant for the workflow process which are/may be registered by an IntIds utility."),
+        required=True,
+        default=(),
+        )
+
+    def getSimilarWorkItems():
+        """ Returns an iterator over similar work items, i.e. work items that """
+
+
 class IHistoryProcess(zope.interface.Interface):
 
     history = zope.interface.Attribute(""" Formal parameter in a process on an object that has a workflow history. Takes an object adaptable to IWorkflowHistory or implementing IWorkflowHistory.""")
@@ -91,6 +117,16 @@ class IRemoveSchema(IHistoryProcess):
         )
 
 
+class IWorkflowInfo(zope.interface.Interface):
+
+    process_name = zope.schema.TextLine(
+        title=u"Process Name",
+        description=u"Name of the workflow process the item is part of.",
+        readonly=True,
+        )
+
+
+
 ### Workflow History
 
 class IHasWorkflowHistory(zope.interface.Interface):
@@ -117,3 +153,7 @@ class IWorkflowHistory(zope.interface.Interface):
 class INotation(zope.interface.Interface):
     """ A notation of an activity or event which will be part of the
     items workflow history."""
+
+
+class IWorkItemForm(zope.interface.Interface):
+    """ A form for managing work items"""

@@ -1,10 +1,13 @@
 import zope.component
+from zope.interface import implements
 from z3c.form import field, button
 from z3c.formui import form
 from zope.wfmc.interfaces import IProcessDefinition
 from zope.traversing.browser import absoluteURL
 from z3c.pagelet.browser import BrowserPagelet
 from zope.proxy import removeAllProxies
+from zope.publisher.browser import BrowserView
+from z3c.ptcompat import ViewPageTemplateFile
 
 from quotationtool.workflow import interfaces
 from quotationtool.workflow.interfaces import _
@@ -13,9 +16,9 @@ from quotationtool.workflow.history import UserNotation
 
 comment = zope.schema.Text(
     title=_('remove-comment-title',
-            u"Comment"),
+            u"Message"),
     description=_('remove-comment-desc',
-                  u"Please give a short comment on why you want the item to be deleted."),
+                  u"Why you want the item to be deleted? Please provide a short message to the editorial staff."),
     required=True,
     )
 comment.__name__ = 'comment'
@@ -60,6 +63,7 @@ class RemoveRequestForm(form.Form):
         history.append(UserNotation(
                 getattr(principal, 'id', u"Unknown"),
                 data['comment']))
+        #self.template = ViewPageTemplateFile('remove_process_started.pt')
         self.request.response.redirect(self.nextURL())
 
     @button.buttonAndHandler(_(u"Cancel"), name="cancel")
@@ -74,8 +78,17 @@ class RemoveProcessStarted(BrowserPagelet):
     """ Notification that the removal process started."""
 
 
+class RemoveWorkItemLabel(BrowserView):
+    """ Label for work item."""
+
+    def __call__(self):
+        return _('remove-workitem-label',
+                 u"Remove")
+
 class RemoveEditorialReview(form.Form):
     
+    implements(interfaces.IWorkItemForm)
+
     fields = field.Fields(review_comment)
 
     label = _('removeeditorialreview-label', u"Editorial Review on Remove Request")
@@ -90,12 +103,11 @@ class RemoveEditorialReview(form.Form):
         if errors:
             self.status = self.formErrorsMessage
             return
-        #TODO!
-        #history = interfaces.IWorkflowHistory(self.context)
+        history = self.context.history
         principal = getattr(self.request, 'principal', None)
-        #history.append(UserNotation(
-        #        getattr(principal, 'id', u"Unkown"),
-        #        data['review_comment']))
+        history.append(UserNotation(
+                getattr(principal, 'id', u"Unkown"),
+                data['review_comment']))
         url = self.nextURL()
         self.context.finish(remove)
         self.request.response.redirect(url)

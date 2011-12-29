@@ -44,12 +44,6 @@
   <subscriber handler=".createWorkFlowContainer"/>
 
 
-  <wfmc:xpdl
-      file="remove.xpdl"
-      process="remove"
-      id="quotationtool.remove"
-      integration="zope.wfmc.adapter.integration"
-      />
   <!--wfmc:xpdl
       file="zopesample.xpdl"
       process="Publication"
@@ -85,22 +79,59 @@
       factory=".workitem.EditorialReviewWorkItem"
       />
 
-  <!-- work items for quotationtool.remove workflow definition -->
+  <!-- adapters for work items -->
+
+  <adapter
+      for="zope.wfmc.interfaces.IWorkItem"
+      provides=".interfaces.IWorkflowInfo"
+      factory=".workitem.WorkflowInfo"
+      trusted="true"
+      />
+  <class class=".workitem.WorkflowInfo">
+    <allow
+	interface=".interfaces.IWorkflowInfo"
+	/>
+  </class>
+
+  <!-- similar work items -->
+
+  <adapter
+      for=".interfaces.ISimilarWorkItems"
+      provides="z3c.indexer.interfaces.IIndexer"
+      factory=".workitem.OIDsIndexer"
+      name="workflow-relevant-oids"
+      />
+  <subscriber handler=".workitem.indexOIDs"/>
+  <subscriber handler=".workitem.unindexOIDs"/>
+
+  <!-- components for quotationtool.remove workflow definition -->
+
+  <wfmc:xpdl
+      file="remove.xpdl"
+      process="remove"
+      id="quotationtool.remove"
+      integration="zope.wfmc.adapter.integration"
+      />
+
   <adapter
       name="quotationtool.remove.remove"
       provides="zope.wfmc.interfaces.IWorkItem"
-      factory=".workitem.RemoveWorkItem"
+      factory=".remove.RemoveWorkItem"
       />
-  <class class=".workitem.RemoveWorkItem">
+
+  <class class=".remove.RemoveWorkItem">
     <implements
 	interface="zope.annotation.interfaces.IAttributeAnnotatable"/>
     <allow
-	attributes="start participant"/>
+	attributes="start contributor object_ history"/>
     <require
 	attributes="finish"
 	permission="quotationtool.workflow.DoEditorialReview"
 	/>
+    <allow
+	interface=".interfaces.ISimilarWorkItems"/>
   </class>
+
 
   <include package=".browser"/>
 
