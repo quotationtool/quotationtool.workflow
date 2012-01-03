@@ -64,8 +64,8 @@ class SiteCreationTests(PlacelessSetup, unittest.TestCase):
         self.assertTrue(isinstance(site['workflow'], WorkFlowContainer))
         from quotationtool.workflow.worklist import WorkList
         self.assertTrue(isinstance(site['workflow']['contributor'], WorkList))
-        self.assertTrue(isinstance(site['workflow']['editorialreview'], WorkList))
-        self.assertTrue(isinstance(site['workflow']['technicalreview'], WorkList))
+        self.assertTrue(isinstance(site['workflow']['editor'], WorkList))
+        self.assertTrue(isinstance(site['workflow']['technicaleditor'], WorkList))
         self.assertTrue(isinstance(site['workflow']['script'], WorkList))
 
     def test_Indices(self):

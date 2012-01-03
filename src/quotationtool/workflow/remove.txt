@@ -11,8 +11,8 @@ We need to set up the worklist for editorial review.
 >>> from quotationtool.workflow.worklist import WorkList
 >>> from quotationtool.workflow.interfaces import IWorkList
 >>> import zope.component
->>> editorialreview_items = WorkList()
->>> zope.component.provideUtility(editorialreview_items, IWorkList, name='editorialreview')
+>>> editor_items = WorkList()
+>>> zope.component.provideUtility(editor_items, IWorkList, name='editor')
 
 Register simple subscriber to make workflow events visible.
 
@@ -79,7 +79,7 @@ Transition(Activity('quotationtool.remove.start'), Activity('quotationtool.remov
 ActivityStarted(Activity('quotationtool.remove.review'))
 ...
 
->>> item = editorialreview_items.pop()
+>>> item = editor_items.pop()
 >>> item
 <quotationtool.workflow.remove.RemoveWorkItem object at 0x...>
 
@@ -94,7 +94,7 @@ ActivityStarted(Activity('quotationtool.remove.review'))
 >>> len(container)
 1
 
->>> item = editorialreview_items.pop()
+>>> item = editor_items.pop()
 >>> item.finish('remove')
 <...
 WorkItemFinished(u'remove')
@@ -117,6 +117,10 @@ Remove simple logger from subscriber list.
 Restrictions
 ~~~~~~~~~~~~
 
+Similar items
++++++++++++++
+
+
 If there is an other work item which takes the object to be removed as
 workflow relevant data, the removal will not be possible. For removal
 would break these other workflow processes. 
@@ -136,7 +140,7 @@ True
 >>> proc2 = pd()
 >>> proc2.start('bob', datetime.datetime.now(), None, bar)
 
->>> item = editorialreview_items.pop()
+>>> item = editor_items.pop()
 
 >>> item.contributor
 'bob'
@@ -163,3 +167,88 @@ There is also in indexer that we want to test:
 >>> indexer.value == [barid]
 True
 
+>>> del container['bar']
+
+Relations
++++++++++
+
+If there are relations of any kind to the item asked to be removed,
+the removal will fail.
+
+First we need to define some content.
+
+>>> from zope.interface import Interface, implements
+>>> class IFoo(Interface):
+...     pass
+...
+>>> class Foo(Contained):
+...     implements(IFoo, IRemovable)
+
+>>> from quotationtool.relation.schema import Relation
+>>> class IBar(Interface):
+...      ref = Relation(
+...	     title=u"Reference to some foo.", 
+...	     precondition=[IFoo])
+...
+
+>>> from zope.schema.fieldproperty import FieldProperty
+>>> class Bar(Contained):
+...      implements(IBar, IRemovable)
+...      ref = FieldProperty(IBar['ref'])
+...
+
+>>> container['foo'] = foo = Foo()
+>>> container['bar'] = bar = Bar()
+>>> bar.ref = foo
+
+>>> fooid = intids.getId(foo)
+>>> barid = intids.getId(bar)
+
+Then we need a relation catalog.
+
+>>> import zc.relation
+>>> from quotationtool.relation import dump, load
+>>> cat = zc.relation.catalog.Catalog(dump, load)
+>>> zope.component.provideUtility(cat, zc.relation.interfaces.ICatalog)
+>>> cat.addValueIndex(IBar['ref'], dump=dump, load=load, name='ibar-ref')
+
+>>> def dummy(obj, catalog):
+...     return getattr(obj, 'ref', None)
+>>> cat.addValueIndex(dummy, dump, load)
+
+>>> cat.index(bar)
+>>> cat.index(foo)
+
+And we assert that the relation catalog works:
+
+>>> referrers = cat.findRelationTokens(
+...     cat.tokenizeQuery({'ibar-ref': foo}))
+...
+>>> list(referrers) == [barid]
+True
+
+>>> [info['name'] for info in cat.iterValueIndexInfo()]
+['dummy', 'ibar-ref']
+
+
+>>> proc = pd()
+>>> proc.start('jonathan', datetime.datetime.now(), None, foo)
+>>> item = editor_items.pop()
+
+
+Since there is a relation from foo to bar the attempt to remove foo
+fails.
+
+>>> item.finish('remove')
+Traceback (most recent call last):
+...
+ProcessError: wfmc-remove-still-relations
+
+
+But if bar is unindexed then we will be able to remove foo.
+
+>>> cat.unindex(bar)
+
+>>> item.finish('remove')
+>>> 'foo' in container
+False

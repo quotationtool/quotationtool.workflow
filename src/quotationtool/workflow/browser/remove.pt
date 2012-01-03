@@ -1,6 +1,6 @@
 <metal:macro use-macro="macro:form" i18n:domain="quotationtool">
   
-  <metal:block fill-slot="extra-info">
+  <div metal:fill-slot="extra-info" class="remove-work-item">
     <div class="form-info"
          tal:condition="view/info|nothing">
       <span class="form-info-label" 
@@ -19,17 +19,23 @@
       </p>
       <div tal:content="structure context/@@similar_work_items"/>
     </div>
-    <div class="remove-relations">
+    <div class="remove-relations" tal:condition="python:context.findRelationTokens() > 0">
       <p i18n:translate="">
-	<b>Attention:</b> Make sure that there are no relations from
-	other items to this item!!!
+	<b>Attention:</b> The database item asked to be removed has
+	still relations to other items. Make sure that there are no
+	relations before removing.
       </p>
     </div>
     <div class="object-details">
       <h3 i18n:translate="">Item to be removed:</h3>
-      <div tal:content="structure context/object_/@@list"/>
+      <div tal:content="structure context/object_/@@details"/>
     </div>
-  </metal:block>
+    <div class="object-link">
+      <a class="internal" href=""
+	 tal:attributes="href context/object_/@@absolute_url"
+	 tal:content="context/object_/@@label">Label</a>
+    </div>
+  </div>
 
   <metal:slot fill-slot="main">
     <metal:macro use-macro="macro:widget-rows"/>

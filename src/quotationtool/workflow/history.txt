@@ -9,8 +9,8 @@ Set up a worklist for editorial review.
 >>> from quotationtool.workflow.worklist import WorkList
 >>> from quotationtool.workflow.interfaces import IWorkList
 >>> import zope.component
->>> editorialreview_items = WorkList()
->>> zope.component.provideUtility(editorialreview_items, IWorkList, name='editorialreview')
+>>> editor_items = WorkList()
+>>> zope.component.provideUtility(editor_items, IWorkList, name='editor')
 
 Register simple subscriber to make workflow events visible.
 
@@ -111,7 +111,7 @@ ActivityStarted(Activity('quotationtool.remove.review'))...
 >>> len(history)
 6
 
->>> item = editorialreview_items.pop()
+>>> item = editor_items.pop()
 >>> item
 <quotationtool.workflow.remove.RemoveWorkItem object at 0x...>
 
@@ -126,7 +126,7 @@ ActivityStarted(Activity('quotationtool.remove.review'))...
 >>> len(history)
 10
 
->>> item = editorialreview_items.pop()
+>>> item = editor_items.pop()
 >>> item.finish('remove')
 <...
 WorkItemFinished(u'remove')...

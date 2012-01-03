@@ -27,51 +27,55 @@ class WorkItemBase(Persistent, Location):
     def __init__(self, participant):
         self.participant = participant
 
-    def _appendToWorkList(self, item):
+    def _appendToWorkList(self):
         worklist = zope.component.getUtility(
             interfaces.IWorkList,
             name=self.worklist,
             context=getSite())
-        worklist.append(item)
+        worklist.append(self)
 
-    def _removeFromWorkList(self, item):
+    def _removeFromWorkList(self):
         worklist = zope.component.getUtility(
             interfaces.IWorkList,
             name=self.worklist,
             context=getSite())
-        worklist.remove(item)
+        worklist.remove(self)
+
+    @property
+    def worklist(self):
+        return self.participant.__name__
 
 
 class ContributorWorkItem(WorkItemBase):
 
-    worklist = 'contributor'
+    #worklist = 'contributor'
 
     schema = interfaces.IEditSchema
 
     def start(self):
-        self._appendToWorkList(self)
+        self._appendToWorkList()
 
     def finish(self, save):
         self.schema['save'].validate(save)
         # we remove the work item on save=='draft', too. It gets added by start again.
-        self._removeFromWorkList(self)
+        self._removeFromWorkList()
         self.participant.activity.workItemFinished(self, save)
 
 
 class EditorialReviewWorkItem(WorkItemBase):
 
-    worklist = 'editorialreview'
+    #worklist = 'editor'
 
     schema = interfaces.IEditorialReviewSchema
 
     def start(self):
-        self._appendToWorkList(self)
+        self._appendToWorkList()
 
     def finish(self, publish):
         self.schema['publish'].validate(publish)
         # we remove the work item on publish=='postpone', too. It gets
         # added by start again.
-        self._removeFromWorkList(self)
+        self._removeFromWorkList()
         self.participant.activity.workItemFinished(self, publish)
 
 

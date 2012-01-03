@@ -2,6 +2,8 @@ import zope.component
 import zope.interface
 from zope.wfmc.interfaces import IWorkItem, IParticipant, ProcessError
 from zope.location.interfaces import IContained
+import BTrees
+import zc.relation
 
 from quotationtool.workflow import interfaces
 from quotationtool.workflow.interfaces import _
@@ -11,11 +13,27 @@ from quotationtool.workflow.workitem import WorkItemBase, SimilarWorkItemsMixin
 class RemoveWorkItem(WorkItemBase, SimilarWorkItemsMixin):
     """ Application to remove a database item."""
 
-    worklist = 'editorialreview'
+    worklist = 'editor' # fix worklist!
 
     oid_attributes = ('object_',) # see ISimilarWorkItems
 
     schema = interfaces.IRemoveSchema
+
+    family = BTrees.family32
+
+    def findRelationTokens(self):
+        """ search for any relations in zc.relation catalogs."""
+        TreeSet = self.family.IF.TreeSet
+        union = self.family.IF.union
+        relations = TreeSet()
+        for cat in zope.component.getAllUtilitiesRegisteredFor(
+            zc.relation.interfaces.ICatalog):
+            for info in cat.iterValueIndexInfo():
+                idx = info['name']
+                rels = cat.findRelationTokens(
+                    cat.tokenizeQuery({idx: self.object_}))
+                relations = TreeSet(union(relations, rels))
+        return relations
 
     def start(self, contributor, starttime, history, object_):
         """Parameters: 
@@ -37,7 +55,7 @@ class RemoveWorkItem(WorkItemBase, SimilarWorkItemsMixin):
                     'wfmc-remove-unremovable',
                     u"Unremovable Object. (Could not determine a way who to remove item.)"
                     ))
-        self._appendToWorkList(self)
+        self._appendToWorkList()
             
     def finish(self, remove):
         self.schema['remove'].validate(remove)
@@ -49,7 +67,15 @@ class RemoveWorkItem(WorkItemBase, SimilarWorkItemsMixin):
             if similars:
                 raise ProcessError(_(
                         'wfmc-remove-still-similar',
-                        u"Could not remove the object. The database item is still under control of other workflow processes. These must be finished first."
+                        u"Failed to remove the object. The database item is still under control of other workflow processes. These must be finished first."
+                        ))
+
+            # assert that the item asked to be removed has no
+            # relations to other items in the database.
+            if len(self.findRelationTokens()) > 0:
+                raise ProcessError(_(
+                        'wfmc-remove-still-relations',
+                        u"Failed to remove the object. The database item still has relations."
                         ))
 
             # for contained item del it on container
@@ -62,5 +88,5 @@ class RemoveWorkItem(WorkItemBase, SimilarWorkItemsMixin):
 
         # we remove the work item on remove=='postpone', too. It gets
         # added by start again.
-        self._removeFromWorkList(self)
+        self._removeFromWorkList()
         self.participant.activity.workItemFinished(self, remove, self.history, self.object_)

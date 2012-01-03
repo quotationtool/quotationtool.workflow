@@ -1,3 +1,4 @@
+import datetime
 import zope.component
 from zope.interface import implements
 from z3c.form import field, button
@@ -21,7 +22,7 @@ comment = zope.schema.Text(
                   u"Why you want the item to be deleted? Please provide a short message to the editorial staff."),
     required=True,
     )
-comment.__name__ = 'comment'
+comment.__name__ = 'workflow-message'
 
 review_comment = zope.schema.Text(
     title=_('removereview-comment-title',
@@ -30,7 +31,7 @@ review_comment = zope.schema.Text(
                   u"Please give a short comment on your decision, especially if you reject the remove request."),
     required=False,
     )
-review_comment.__name__ = 'review_comment'
+review_comment.__name__ = 'workflow-message'
 
 class RemoveRequestForm(form.Form):
 
@@ -58,11 +59,13 @@ class RemoveRequestForm(form.Form):
         proc = pd()
         # TODO: Note that we have to remove the security proxy!
         proc.start(getattr(principal, 'id', u"Unkown"),
-                   removeAllProxies(self.context), 
-                   removeAllProxies(history))
+                   datetime.datetime.now(),
+                   removeAllProxies(history),
+                   removeAllProxies(self.context) 
+                   )
         history.append(UserNotation(
                 getattr(principal, 'id', u"Unknown"),
-                data['comment']))
+                data['workflow-message']))
         #self.template = ViewPageTemplateFile('remove_process_started.pt')
         self.request.response.redirect(self.nextURL())
 
@@ -107,7 +110,8 @@ class RemoveEditorialReview(form.Form):
         principal = getattr(self.request, 'principal', None)
         history.append(UserNotation(
                 getattr(principal, 'id', u"Unkown"),
-                data['review_comment']))
+                data['workflow-message']))
+        #get next URL before removing work item
         url = self.nextURL()
         self.context.finish(remove)
         self.request.response.redirect(url)

@@ -23,15 +23,15 @@ def createWorkFlowContainer(event):
     dc.title = u"Contribution"
     dc.description = u"List of work items to be worked on by contributors."
 
-    container['editorialreview'] = editorialreview = WorkList()
-    sm.registerUtility(editorialreview, interfaces.IWorkList, name='editorialreview')
-    dc = IWriteZopeDublinCore(editorialreview)
+    container['editor'] = editor = WorkList()
+    sm.registerUtility(editor, interfaces.IWorkList, name='editor')
+    dc = IWriteZopeDublinCore(editor)
     dc.title = u"Editorial Review"
     dc.description = u"List of work items to be reviewed by the site's editors."
 
-    container['technicalreview'] = technicalreview = WorkList()
-    sm.registerUtility(technicalreview, interfaces.IWorkList, name='technicalreview')
-    dc = IWriteZopeDublinCore(technicalreview)
+    container['technicaleditor'] = technicaleditor = WorkList()
+    sm.registerUtility(technicaleditor, interfaces.IWorkList, name='technicaleditor')
+    dc = IWriteZopeDublinCore(technicaleditor)
     dc.title = u"Technical Review"
     dc.description = u"List of work items to be reviewed by the site's technical staff."
 

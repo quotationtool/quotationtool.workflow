@@ -17,12 +17,16 @@ class ParticipantBase(Persistent):
 
 
 class ContributorParticipant(ParticipantBase):
-    pass
+    """ Contributor participant swimming in the contributor lane."""
+
+    __name__ = 'contributor'
 
 
 class EditorParticipant(ParticipantBase):
-    pass
+    
+    __name__ = 'editor'
 
 
 class TechnicalEditorParticipant(ParticipantBase):
-    pass
+    
+    __name__ = 'technicaleditor'

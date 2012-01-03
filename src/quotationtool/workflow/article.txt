@@ -31,8 +31,8 @@ We need to set up some worklists.
 >>> import zope.component
 >>> contributor_items = WorkList()
 >>> zope.component.provideUtility(contributor_items, IWorkList, name='contributor')
->>> editorialreview_items = WorkList()
->>> zope.component.provideUtility(editorialreview_items, IWorkList, name='editorialreview')
+>>> editor_items = WorkList()
+>>> zope.component.provideUtility(editor_items, IWorkList, name='editor')
 
 Register simple subscriber to make workflow events visible.
 
@@ -100,6 +100,9 @@ True
 >>> item
 <quotationtool.workflow.workitem.ContributorWorkItem object at 0x...>
 
+>>> item.participant.__name__
+'contributor'
+
 >>> item.finish('hi')
 Traceback (most recent call last):
 ...
@@ -129,10 +132,10 @@ ActivityStarted(Activity('quotationtool.article.review'))
 >>> len(contributor_items)
 0
 
->>> len(editorialreview_items)
+>>> len(editor_items)
 1
 
->>> item = editorialreview_items.pop()
+>>> item = editor_items.pop()
 >>> item
 <quotationtool.workflow.workitem.EditorialReviewWorkItem object at 0x...>
 
@@ -147,7 +150,7 @@ ActivityStarted(Activity('quotationtool.article.edit'))
 >>> proc.workflowRelevantData.publish
 'needs_changes'
 
->>> len(editorialreview_items)
+>>> len(editor_items)
 0
 
 >>> len(contributor_items)
@@ -162,7 +165,7 @@ Transition(Activity('quotationtool.article.edit'), Activity('quotationtool.artic
 ActivityStarted(Activity('quotationtool.article.review'))
 ...
 
->>> item = editorialreview_items.pop()
+>>> item = editor_items.pop()
 >>> item.finish('publish')
 <...
 ActivityFinished(Activity('quotationtool.article.review'))

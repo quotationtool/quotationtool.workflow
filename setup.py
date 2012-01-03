@@ -92,6 +92,8 @@ setup(
             'zope.configuration',
             'zope.site',
             'zope.app.testing',
+            'quotationtool.relation',
+
             ],
         ),
     )

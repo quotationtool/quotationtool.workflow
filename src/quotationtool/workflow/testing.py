@@ -135,3 +135,22 @@ def addIntIdSubscriber(ob, event):
         # Notify the catalogs that this object was added.
         zope.event.notify(IntIdAddedEvent(ob, event, idmap))
 
+
+# dump and load methods for relation catalog
+
+def dump(obj, catalog, cache):
+    """ Dump an object."""
+    intids_ut = cache.get('intids_ut')
+    if not intids_ut:
+        intids_ut = zope.component.getUtility(IIntIds)
+        cache['intids_ut'] = intids_ut
+    return intids_ut.getId(obj)
+
+def load(token, catalog, cache):
+    """Load an object."""
+    intids_ut = cache.get('intids_ut')
+    if not intids_ut:
+        intids_ut = zope.component.getUtility(IIntIds)
+        cache['intids_ut'] = intids_ut
+    return intids_ut.getObject(token)
+
