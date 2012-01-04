@@ -1,0 +1,45 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:z3c="http://namespaces.zope.org/z3c"
+    i18n_domain="quotationtool">
+
+  <z3c:contextMenuItem
+      for="..interfaces.IHasWorkflowHistory"
+      title="[workflow-tab] Workflow"
+      name="workflow"
+      class=".tabs.WorkflowTab"
+      permission="quotationtool.workflow.ReadHistory"
+      layer="quotationtool.skin.interfaces.IQuotationtoolBrowserLayer"
+      manager="quotationtool.skin.interfaces.IItemTabs"
+      viewName="@@workflow.html"
+      weight="2012"
+      />
+  <adapter
+      for="..interfaces.IHasWorkflowHistory
+	   zope.publisher.interfaces.browser.IBrowserRequest
+	   .history.WorkflowHistory
+	   z3c.menu.ready2go.interfaces.IMenuManager
+	   .tabs.IWorkflowTab"
+      provides="z3c.menu.ready2go.interfaces.ISelectedChecker"
+      factory="z3c.menu.ready2go.checker.TrueSelectedChecker"
+      />
+  <adapter
+      for="..interfaces.IRemovable
+	   zope.publisher.interfaces.browser.IBrowserRequest
+	   .remove.RemoveRequestForm
+	   z3c.menu.ready2go.interfaces.IMenuManager
+	   .tabs.IWorkflowTab"
+      provides="z3c.menu.ready2go.interfaces.ISelectedChecker"
+      factory="z3c.menu.ready2go.checker.TrueSelectedChecker"
+      />
+  <adapter
+      for="..interfaces.IRemovable
+	   zope.publisher.interfaces.browser.IBrowserRequest
+	   .remove.RemoveProcessStarted
+	   z3c.menu.ready2go.interfaces.IMenuManager
+	   .tabs.IWorkflowTab"
+      provides="z3c.menu.ready2go.interfaces.ISelectedChecker"
+      factory="z3c.menu.ready2go.checker.TrueSelectedChecker"
+      />
+
+</configure>

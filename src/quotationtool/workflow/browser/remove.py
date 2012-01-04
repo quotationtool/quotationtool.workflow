@@ -10,6 +10,8 @@ from zope.proxy import removeAllProxies
 from zope.publisher.browser import BrowserView
 from z3c.ptcompat import ViewPageTemplateFile
 
+from quotationtool.skin.interfaces import ITabbedContentLayout
+
 from quotationtool.workflow import interfaces
 from quotationtool.workflow.interfaces import _
 from quotationtool.workflow.history import UserNotation
@@ -34,6 +36,8 @@ review_comment = zope.schema.Text(
 review_comment.__name__ = 'workflow-message'
 
 class RemoveRequestForm(form.Form):
+
+    implements(ITabbedContentLayout)
 
     label = _('removerequestform-label',
               u"Remove database item")
@@ -65,7 +69,8 @@ class RemoveRequestForm(form.Form):
                    )
         history.append(UserNotation(
                 getattr(principal, 'id', u"Unknown"),
-                data['workflow-message']))
+                data['workflow-message']
+                ))
         #self.template = ViewPageTemplateFile('remove_process_started.pt')
         self.request.response.redirect(self.nextURL())
 
@@ -79,6 +84,8 @@ class RemoveRequestForm(form.Form):
 
 class RemoveProcessStarted(BrowserPagelet):
     """ Notification that the removal process started."""
+
+    implements(ITabbedContentLayout)
 
 
 class RemoveWorkItemLabel(BrowserView):

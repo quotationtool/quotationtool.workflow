@@ -1,0 +1,51 @@
+<configure
+    xmlns:zope="http://namespaces.zope.org/zope"
+    xmlns:z3c="http://namespaces.zope.org/z3c"
+    xmlns:browser="http://namespaces.zope.org/browser"
+    i18n_domain="quotationtool">
+
+  <!-- navigation -->
+
+  <z3c:siteMenuItem
+      for="*"
+      title="[workflowcontainer-navigation] Workflow"
+      name="workflowcontainer"
+      class=".nav.WorkFlowContainerMainNavItem"
+      permission="quotationtool.workflow.ManageWorkflow"
+      layer="quotationtool.skin.interfaces.IQuotationtoolBrowserLayer"
+      manager="quotationtool.skin.interfaces.IMainNav"
+      viewName="workflow/"
+      subMenuProviderName="workflowcontainersubnav"
+      weight="80"
+      />
+  <!-- adaptation: context, request, view, menu, item. See
+       z3c.menu.ready2go.checker for more info. -->
+  <zope:adapter
+      factory="z3c.menu.ready2go.checker.TrueSelectedChecker"
+      for="..interfaces.IWorkFlowContainer
+           quotationtool.skin.interfaces.IQuotationtoolBrowserLayer
+           zope.interface.Interface
+           quotationtool.skin.interfaces.IMainNav
+           .nav.IWorkFlowContainerMainNavItem"
+      provides="z3c.menu.ready2go.interfaces.ISelectedChecker"
+      />
+  <zope:adapter
+      factory="z3c.menu.ready2go.checker.TrueSelectedChecker"
+      for="..interfaces.IWorkList
+           quotationtool.skin.interfaces.IQuotationtoolBrowserLayer
+           zope.interface.Interface
+           quotationtool.skin.interfaces.IMainNav
+           .nav.IWorkFlowContainerMainNavItem"
+      provides="z3c.menu.ready2go.interfaces.ISelectedChecker"
+      />
+
+  <browser:viewletManager
+      name="workflowcontainersubnav"
+      class=".nav.WorkFlowContainerSubNav"
+      provides=".nav.IWorkFlowContainerSubNav"
+      permission="zope.View"
+      layer="quotationtool.skin.interfaces.IQuotationtoolBrowserLayer"
+      />
+
+
+</configure>

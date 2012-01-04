@@ -1,0 +1,10 @@
+<div class="notation user-notation" i18n:domain="quotationtool"
+     tal:attributes="class view/cssClass">
+
+  <div class="by" i18n:translate="">
+    Message by <span i18n:name="user" tal:content="view/name|default">Unkown</span>:
+  </div>
+
+  <div class="message" tal:content="context/msg|nothing">Message</div>
+
+</div>

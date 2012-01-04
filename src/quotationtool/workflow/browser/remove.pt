@@ -19,21 +19,29 @@
       </p>
       <div tal:content="structure context/@@similar_work_items"/>
     </div>
-    <div class="remove-relations" tal:condition="python:context.findRelationTokens() > 0">
+    <div class="remove-relations" tal:condition="context/findRelationTokens">
       <p i18n:translate="">
 	<b>Attention:</b> The database item asked to be removed has
 	still relations to other items. Make sure that there are no
 	relations before removing.
       </p>
     </div>
-    <div class="object-details">
+    <div class="remove-object">
       <h3 i18n:translate="">Item to be removed:</h3>
-      <div tal:content="structure context/object_/@@details"/>
+      <div class="details" tal:content="structure context/object_/@@details"/>
+      <div class="object-link">
+	<a class="internal" href=""
+	   tal:attributes="href context/object_/@@absolute_url"
+	   tal:content="context/object_/@@label">Label</a>
+      </div>
     </div>
-    <div class="object-link">
-      <a class="internal" href=""
-	 tal:attributes="href context/object_/@@absolute_url"
-	 tal:content="context/object_/@@label">Label</a>
+    <div class="history-itemform">
+      <h3 i18n:translate="">Workflow History (reversed order)</h3>
+      <div class="workflow-history">
+	<div tal:repeat="notation context/history/reverse" 
+	     tal:content="structure notation/@@details">
+	</div>
+      </div>
     </div>
   </div>
 

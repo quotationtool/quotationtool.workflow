@@ -17,11 +17,6 @@ from quotationtool.skin.interfaces import IQuotationtoolBrowserLayer
 
 
 def setUpZCML(test):
-    """
-        >>> XMLConfig('configure.zcml', quotationtool.workflow)()
-        >>> XMLConfig('configure.zcml', quotationtool.workflow.browser)()
-
-    """
     setUp(test)
     XMLConfig('configure.zcml', quotationtool.workflow)()
     XMLConfig('configure.zcml', quotationtool.workflow.browser)()
@@ -278,11 +273,72 @@ class ListWorkListsTests(PlacelessSetup, unittest.TestCase):
         self.assertTrue(isinstance(pagelet.render(), unicode))
 
 
+class WorkListTests(PlacelessSetup, unittest.TestCase):
+
+    def setUp(self):
+        super(WorkListTests, self).setUp()
+        setUpZCML(self)
+        setUpIntIds(self)
+        setUpRelationCatalog(self)
+        self.root = rootFolder()
+        setUpWorkLists(self.root)
+        setUpIndexes(self)
+        generateContent(self.root)
+        from quotationtool.workflow.interfaces import IWorkList
+        self.worklist = zope.component.getUtility(IWorkList, name='editor', context=self.root)
+
+    def tearDown(self):
+        tearDown(self)
+
+    def test_WorkList(self):
+        from quotationtool.workflow.browser import worklist
+        # use remove as sample work item
+        startRemove(TestRequest().principal.id, self.root['foo2'])
+        pagelet = worklist.WorkListTable(self.worklist, TestRequest())
+        pagelet.update()
+        self.assertTrue(isinstance(pagelet.render(), unicode))
+        
+
+class WorkflowHistoryTests(PlacelessSetup, unittest.TestCase):
+
+    def setUp(self):
+        super(WorkflowHistoryTests, self).setUp()
+        setUpZCML(self)
+        setUpIntIds(self)
+        setUpRelationCatalog(self)
+        self.root = rootFolder()
+        setUpWorkLists(self.root)
+        setUpIndexes(self)
+        generateContent(self.root)
+        from quotationtool.workflow.interfaces import IWorkList
+        self.worklist = zope.component.getUtility(IWorkList, name='editor', context=self.root)
+
+    def tearDown(self):
+        tearDown(self)
+
+    def test_WorkflowHistory(self):
+        from quotationtool.workflow.browser import history
+        from quotationtool.workflow.interfaces import IWorkflowHistory
+        from quotationtool.workflow.history import UserNotation
+        # use remove as sample work item
+        startRemove(TestRequest().principal.id, self.root['foo2'])
+        startRemove(TestRequest().principal.id, self.root['foo2'])
+        startRemove(TestRequest().principal.id, self.root['foo2'])
+        hstry = IWorkflowHistory(self.root['foo2'])
+        hstry.append(UserNotation(TestRequest().principal.id, "We still need it!\nBelieve me."))
+        item = self.worklist.pop()
+        item.finish('reject')
+        pagelet = history.WorkflowHistory(self.root['foo2'], TestRequest())
+        pagelet.update()
+        self.assertTrue(isinstance(pagelet.render(), unicode))
+
+
 def test_suite():
     return unittest.TestSuite((
-            doctest.DocTestSuite(setUp = setUp, tearDown = tearDown),
             unittest.makeSuite(RemoveTests),
             unittest.makeSuite(ListWorkListsTests),
+            unittest.makeSuite(WorkListTests),
+            unittest.makeSuite(WorkflowHistoryTests),
             ))
 
 if __name__ == "__main__":

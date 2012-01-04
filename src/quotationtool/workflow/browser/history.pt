@@ -1,0 +1,27 @@
+<div i18n:domain="quotationtool">
+  
+  <h1 i18n:translate="">Workflow</h1>
+
+  <p i18n:translate="workflow-history-description">
+    Adding, changing, removing items to the database is controled by
+    workflow processes, that let the site's editors decide whether an
+    item, some user contributes, will be published or not, whether it
+    needs changes, whether it will be removed etc. Contributions,
+    requests for change or removal and the decisions of the editors
+    make the item's workflow history.
+  </p>
+
+  <tal:block condition="view/notations">
+  <h2 i18n:translate="">Workflow History (reversed order)</h2>
+  <div class="workflow-history">
+    <div tal:repeat="notation view/notations" 
+	 tal:content="structure notation/@@details">
+    </div>
+  </div>
+  </tal:block>
+
+  <h2 i18n:translate="">Current Work Items</h2>
+
+  <div tal:replace="structure view/renderTable"/>
+
+</div>

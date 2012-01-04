@@ -14,7 +14,12 @@
 
   <permission
       id="quotationtool.workflow.DoEditorialReview"
-      title="[do-editorial-review-permission-title] Perform an editorial review of a database item ."
+      title="[do-editorial-review-permission-title] Perform an editorial review of a database item."
+      />
+
+  <permission
+      id="quotationtool.workflow.ReadHistory"
+      title="[read-workflow-history-permission-title] Read the workflow history of a database item."
       />
 
 </configure>

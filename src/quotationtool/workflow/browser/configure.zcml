@@ -4,6 +4,9 @@
   <include file="dependencies.zcml"/>
   <include file="exception.zcml"/>
   <include file="worklist.zcml"/>
+  <include file="history.zcml"/>
   <include file="remove.zcml"/>
+  <include file="nav.zcml"/>
+  <include file="tabs.zcml"/>
 
 </configure>

@@ -1,7 +1,9 @@
 <div i18n:domain="quotationtool">
 
   <h1 i18n:translate="">
-    <span i18n:name="title" tal:content="context/zope:title|nothing">Contribution</span> 
+    <span i18n:name="title" tal:content="context/zope:title|default">
+      <span tal:content="context/__name__|nothing">Contribution</span>
+    </span>
     Work Items
   </h1>
 

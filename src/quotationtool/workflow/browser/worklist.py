@@ -52,10 +52,10 @@ class WorkListTable(table.Table, BrowserPagelet):
     cssClassOdd = u"odd"
 
     def title(self):
-        return getattr(IZopeDublinCore(self.context, None), 'title', u'Unkown')
+        return getattr(IZopeDublinCore(self.context, None), 'title', self.context.__name__)
 
     def description(self):
-        return getattr(IZopeDublinCore(self.context, None), 'description', u'Unkown')
+        return getattr(IZopeDublinCore(self.context, None), 'description', u"")
 
 
 class SimilarWorkItemsTable(table.Table, BrowserView):

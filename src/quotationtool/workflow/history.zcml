@@ -7,6 +7,9 @@
 	/>
     <allow
 	attributes="__call__ reverse"/>
+    <allow
+	interface="zope.container.interfaces.IReadContainer"
+	/>
     <require
 	permission="zope.ManageContent"
 	attributes="append"
@@ -47,6 +50,10 @@
   </class>
   <subscriber handler=".history.transitionSubscriber"/>
 
+  <class class=".history.UserNotation">
+    <allow
+	attributes="uid msg __repr__"/>
+  </class>
 
 
 

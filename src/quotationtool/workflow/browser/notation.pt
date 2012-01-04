@@ -1,0 +1,3 @@
+<div class="notation"
+     tal:attributes="class view/cssClass"
+     tal:content="context/__repr__">Notation of workflow event.</div>

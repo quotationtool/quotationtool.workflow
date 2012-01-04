@@ -9,6 +9,8 @@ from persistent import Persistent
 import zope.annotation
 from zope.wfmc import process
 from zope.security.management import getInteraction
+from zope.authentication.interfaces import IAuthentication
+from zope.app.component.hooks import getSite
 
 from quotationtool.workflow import interfaces
 from quotationtool.workflow.interfaces import _
@@ -30,7 +32,8 @@ class WorkflowHistory(BTreeContainer):
         return self.values()
 
     def reverse(self):
-        return reverse(self.values())
+        for i in range(len(self.values())):
+            yield list(self.values())[-1-i]
 
 WORKFLOW_HISTORY_KEY = 'quotationtool.workflow.history'
 
@@ -47,6 +50,16 @@ class NotationNameChooser(NameChooser):
         """ choose timestamp as name."""
         now = unicode(datetime.datetime.now())
         return super(NotationNameChooser, self).chooseName(now, obj)
+
+
+def userName(uid, context=getSite()):
+    pau = zope.component.queryUtility(IAuthentication, context=context)
+    user = u"Unkown"
+    try:
+        user = pau.getPrincipal(uid).title
+    except Exception:
+        pass
+    return user
 
 
 class NotationBase(Persistent, Contained):
@@ -81,8 +94,11 @@ class ProcessStartedNotation(NotationBase):
     def __repr__(self):
         return _('process-started-notation',
                  u"$NAME workflow process ($ID) started by $CONTRIB. $DESC", 
-                 mapping={'NAME': self.name, 'ID': self.pid,
-                          'DESC': self.description, 'CONTRIB': self.contributor})
+                 mapping={'NAME': self.name, 
+                          'ID': self.pid,
+                          'DESC': self.description, 
+                          'CONTRIB': userName(self.contributor, self),
+                          })
 
 @adapter(process.ProcessStarted)
 def processStartedSubscriber(event):
@@ -127,7 +143,7 @@ class ActivityStartedNotation(NotationBase):
         
     def __repr__(self):
         return _('activity-started-notation',
-                 u"Activity $ID started.",
+                 u"Activity '$ID' started.",
                  mapping={'ID': self.id})
 
 @adapter(process.ActivityStarted)
@@ -145,7 +161,7 @@ class ActivityFinishedNotation(ActivityStartedNotation):
 
     def __repr__(self):
         return _('activity-finished-notation',
-                 u"Activity $ID finished.",
+                 u"Activity '$ID' finished.",
                  mapping={'ID': self.id})
 
 @adapter(process.ActivityFinished)
@@ -182,7 +198,7 @@ class TransitionNotation(NotationBase):
     
     def __init__(self, from_, to):
         self.from_= getattr(from_, 'activity_definition_identifier', None)
-        self.to = getattr(from_, 'activity_definition_identifier', None)
+        self.to = getattr(to, 'activity_definition_identifier', None)
 
     def __repr__(self):
         return _('transition-notation',
