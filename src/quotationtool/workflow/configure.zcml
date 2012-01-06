@@ -44,13 +44,6 @@
   <subscriber handler=".createWorkFlowContainer"/>
 
 
-  <!--wfmc:xpdl
-      file="zopesample.xpdl"
-      process="Publication"
-      id="example.publication"
-      integration="zope.wfmc.adapter.integration"
-      /-->
-
   <adapter
       name=".contributor"
       provides="zope.wfmc.interfaces.IParticipant"
@@ -124,6 +117,33 @@
 	interface="zope.annotation.interfaces.IAttributeAnnotatable"/>
     <allow
 	attributes="start contributor starttime object_ history findRelationTokens"/>
+    <require
+	attributes="finish"
+	permission="quotationtool.workflow.DoEditorialReview"
+	/>
+    <allow
+	interface=".interfaces.ISimilarWorkItems"/>
+  </class>
+
+  <!-- components for quotationtool.message workflow definition -->
+
+  <wfmc:xpdl
+      file="message.xpdl"
+      process="message"
+      id="quotationtool.message"
+      integration="zope.wfmc.adapter.integration"
+      />
+
+  <adapter
+      provides="zope.wfmc.interfaces.IWorkItem"
+      name="quotationtool.message.review"
+      factory=".message.MessageWorkItem"
+      />
+  <class class=".message.MessageWorkItem">
+    <implements
+	interface="zope.annotation.interfaces.IAttributeAnnotatable"/>
+    <allow
+	attributes="start contributor starttime message history object_"/>
     <require
 	attributes="finish"
 	permission="quotationtool.workflow.DoEditorialReview"

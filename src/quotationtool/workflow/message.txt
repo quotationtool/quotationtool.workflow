@@ -1,0 +1,141 @@
+Message
+=======
+
+
+We need to set up the worklist for editorial review.
+
+    >>> from quotationtool.workflow.worklist import WorkList
+    >>> from quotationtool.workflow.interfaces import IWorkList
+    >>> import zope.component
+    >>> editor_items = WorkList()
+    >>> zope.component.provideUtility(editor_items, IWorkList, name='editor')
+
+Register simple subscriber to make workflow events visible.
+
+    >>> def log_workflow(event):
+    ...     print(event)
+
+    >>> import zope.event
+    >>> zope.event.subscribers.append(log_workflow)
+
+Get workflow definition.
+
+    >>> from zope.wfmc.interfaces import IProcessDefinition
+    >>> import zope.component
+    >>> pd = zope.component.getUtility(IProcessDefinition,
+    ...                                'quotationtool.message')
+
+    >>> pd
+    ProcessDefinition('quotationtool.message')
+
+    >>> pd.id
+    'quotationtool.message'
+
+
+    >>> proc = pd()
+
+    >>> import datetime
+    >>> now = datetime.datetime.now()
+
+    >>> proc.start('chris', now, u"Hello to editor!", None, object())
+    ProcessStarted(Process('quotationtool.message'))
+    Transition(None, Activity('quotationtool.message.message_act1'))
+    ActivityStarted(Activity('quotationtool.message.message_act1'))
+    ActivityFinished(Activity('quotationtool.message.message_act1'))
+    Transition(Activity('quotationtool.message.message_act1'), Activity('quotationtool.message.review'))
+    ActivityStarted(Activity('quotationtool.message.review'))
+    ...
+
+Now there is an item in the editor's worklist.
+
+    >>> item = editor_items.pop()
+
+The formal parameters to the process' start are now present in the item.
+
+    >>> item.contributor
+    'chris'
+
+    >>> item.starttime == now
+    True
+
+    >>> item.message
+    u'Hello to editor!'
+
+    >>> item.object_
+    <object object at 0x...>
+
+    >>> item.history is None
+    True
+
+Now that we have read the message we still need some time to think
+about it and so we decide to postpone.
+
+    >>> item.finish('postpone', u"Don't know..")
+    <...
+    WorkItemFinished(u'review')
+    ActivityFinished(Activity('quotationtool.message.review'))
+    Transition(Activity('quotationtool.message.review'), Activity('quotationtool.message.review'))
+    ActivityStarted(Activity('quotationtool.message.review'))
+    ...
+
+
+So there is a work item for the editors again.
+
+    >>> item = editor_items.pop()
+    >>> item.message
+    u'Hello to editor!'
+
+
+    >>> item.finish('answer', u"Hello to contributor")
+    <...
+    WorkItemFinished(u'review')
+    ActivityFinished(Activity('quotationtool.message.review'))
+    Transition(Activity('quotationtool.message.review'), Activity('quotationtool.message.message_act3'))
+    ActivityStarted(Activity('quotationtool.message.message_act3'))
+    ActivityFinished(Activity('quotationtool.message.message_act3'))
+    ProcessFinished(Process('quotationtool.message'))
+
+
+Remove the logger.
+
+    >>> zope.event.subscribers.remove(log_workflow)
+
+
+
+Similar items
+~~~~~~~~~~~~~
+
+There is an index watching which workflow items have (are about) which
+database items. 
+
+This is done by integer ids. There is an intids utility set up in test
+setup and also an index.
+
+    >>> import zope.component
+    >>> from zope.intid.interfaces import IIntIds
+    >>> intids = zope.component.getUtility(IIntIds)
+    >>> obj = object()
+    >>> oid = intids.register(obj)
+    
+
+    >>> from z3c.indexer import query, search
+    >>> qry = search.SearchQuery(query.AnyOf('workflow-relevant-oids', (oid,)))
+    >>> result = qry.apply()
+    >>> len(list(result))
+    0
+
+    >>> proc = pd()
+    >>> proc.start('chris', now, u"Hello again", None, obj)
+ 
+    >>> qry = search.SearchQuery(query.AnyOf('workflow-relevant-oids', (oid,)))
+    >>> result = qry.apply()
+    >>> len(list(result))
+    1
+
+    >>> item = editor_items.pop()
+    >>> item_id = intids.getId(item)
+    >>> list(result) == [item_id]
+    True
+
+    >>> item.finish('answer', u"Done")
+

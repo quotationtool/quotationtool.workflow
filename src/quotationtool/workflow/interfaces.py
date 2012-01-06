@@ -117,6 +117,22 @@ class IRemoveSchema(IHistoryProcess):
         )
 
 
+class ISubjectOfMessage(zope.interface.Interface):
+    """ Marker interface for a content object on which a
+    quotationtool.message workflow can be performed."""
+
+
+class IMessageSchema(zope.interface.Interface):
+
+    answer = zope.schema.Choice(
+        title=u"Answer",
+        description=u"Input data passed to the finish method of the application.",
+        values=('answer', 'postpone'),
+        required=True,
+        default='answer',
+        )
+
+
 class IWorkflowInfo(zope.interface.Interface):
 
     process_name = zope.schema.TextLine(

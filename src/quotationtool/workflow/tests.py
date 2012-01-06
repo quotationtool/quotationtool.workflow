@@ -91,4 +91,8 @@ def test_suite():
                                  setUp = setUpOIDs,
                                  tearDown = tearDown,
                                  optionflags=_flags),
+            doctest.DocFileSuite('message.txt',
+                                 setUp = setUpOIDs,
+                                 tearDown = tearDown,
+                                 optionflags=_flags),
             ))

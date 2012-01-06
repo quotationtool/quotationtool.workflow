@@ -38,13 +38,14 @@ from zope.schema.fieldproperty import FieldProperty
 from zope.container.contained import Contained
 from zope.annotation.interfaces import IAttributeAnnotatable
 from persistent import Persistent
-from quotationtool.workflow.interfaces import IHasWorkflowHistory, IRemovable
+from quotationtool.workflow.interfaces import IHasWorkflowHistory
+from quotationtool.workflow.interfaces import IRemovable, ISubjectOfMessage
 
 class IFoo(Interface):
     pass
 
 class Foo(Contained, Persistent):
-    implements(IFoo, IHasWorkflowHistory, IRemovable, IAttributeAnnotatable)
+    implements(IFoo, IHasWorkflowHistory, IRemovable, ISubjectOfMessage, IAttributeAnnotatable)
 
 class IBar(Interface):
     ref = zope.schema.Object(title=u"Reference", schema=IFoo)
@@ -95,14 +96,6 @@ def setUpIndexes(test):
     idx = SetIndex()
     zope.component.provideUtility(idx, IIndex, name='workflow-relevant-oids')
 
-def startRemove(contributor, obj):
-    from quotationtool.workflow.interfaces import IWorkflowHistory
-    history = IWorkflowHistory(obj)
-    import datetime
-    from zope.wfmc.interfaces import IProcessDefinition
-    pd = zope.component.getUtility(IProcessDefinition, 'quotationtool.remove')
-    proc = pd()
-    proc.start(contributor, datetime.datetime.now(), history, obj)
 
 class SkinTests(PlacelessSetup, unittest.TestCase):
     
@@ -120,6 +113,16 @@ class TestRequest(zope.publisher.browser.TestRequest):
 
     principal = Principal('testing')
 
+
+def startRemove(contributor, obj):
+    """ Helper that starts remove workflow process."""
+    from quotationtool.workflow.interfaces import IWorkflowHistory
+    history = IWorkflowHistory(obj)
+    import datetime
+    from zope.wfmc.interfaces import IProcessDefinition
+    pd = zope.component.getUtility(IProcessDefinition, 'quotationtool.remove')
+    proc = pd()
+    proc.start(contributor, datetime.datetime.now(), history, obj)
 
 
 class RemoveTests(PlacelessSetup, unittest.TestCase):
@@ -255,6 +258,103 @@ class RemoveTests(PlacelessSetup, unittest.TestCase):
         self.assertTrue(isinstance(view(), unicode))
 
 
+def startMessage(contributor, msg, obj):
+    """ Helper that starts message workflow process."""
+    from quotationtool.workflow.interfaces import IWorkflowHistory
+    history = IWorkflowHistory(obj)
+    import datetime
+    from zope.wfmc.interfaces import IProcessDefinition
+    pd = zope.component.getUtility(IProcessDefinition, 'quotationtool.message')
+    proc = pd()
+    proc.start(contributor, datetime.datetime.now(), msg, history, obj)
+
+
+class MessageTests(PlacelessSetup, unittest.TestCase):
+
+    def setUp(self):
+        super(MessageTests, self).setUp()
+        setUpZCML(self)
+        setUpIntIds(self)
+        setUpRelationCatalog(self)
+        self.root = rootFolder()
+        setUpWorkLists(self.root)
+        setUpIndexes(self)
+        generateContent(self.root)
+        from quotationtool.workflow.interfaces import IWorkList
+        self.worklist = zope.component.getUtility(IWorkList, name='editor', context=self.root)
+
+    def tearDown(self):
+        tearDown(self)
+
+    def test_MessageProcessStarted(self):
+        from quotationtool.workflow.browser import message
+        pagelet = message.MessageProcessStarted(self.root['foo2'], TestRequest())
+        self.assertTrue(isinstance(pagelet.render(), unicode))
+
+    def test_MessageRequestForm(self):
+        from quotationtool.workflow.browser import message
+        pagelet = message.MessageRequestForm(self.root['foo2'], TestRequest())
+        pagelet.update()
+        self.assertTrue(isinstance(pagelet.render(), unicode))
+
+        request = TestRequest(form={
+                'form.widgets.workflow-message': u"There's a typo.",
+                'form.buttons.send': u"Send",
+                })
+        pagelet = message.MessageRequestForm(self.root['foo2'], request)
+        pagelet.update()
+        self.assertTrue(len(self.worklist) == 1)
+
+    def test_MessageEditorialReview(self):
+        from quotationtool.workflow.browser import message
+        startMessage(TestRequest().principal.id, u"I found a typo.", self.root['foo2'])
+        item = self.worklist.pop()
+        pagelet = message.MessageEditorialReview(item, TestRequest())
+        pagelet.update()
+        self.assertTrue(isinstance(pagelet.render(), unicode))
+
+    def test_Postpone(self):
+        from quotationtool.workflow.browser import message
+        startMessage(TestRequest().principal.id, u"I found a typo.", self.root['foo2'])
+        item = self.worklist.pop()
+        request = TestRequest(form={
+                'form.widgets.workflow-message': u"?",
+                'form.buttons.postpone': u"Postpone",
+                })
+        pagelet = message.MessageEditorialReview(item, request)
+        pagelet.update()
+        self.assertTrue(len(self.worklist) == 1)
+        self.assertTrue('foo2' in self.root)
+
+    def test_Answer(self):
+        from quotationtool.workflow.browser import message
+        startMessage(TestRequest().principal.id, u"I found a typo.", self.root['foo2'])
+        item = self.worklist.pop()
+        request = TestRequest(form={
+                'form.widgets.workflow-message': u"Yes, I corrected it. Thx!",
+                'form.buttons.answer': u"Answer",
+                })
+        pagelet = message.MessageEditorialReview(item, request)
+        pagelet.update()
+        self.assertTrue(len(self.worklist) == 0)
+        self.assertTrue('foo2' in self.root)
+
+    def test_ItemInWorkList(self):
+        from quotationtool.workflow.browser import worklist
+        startMessage(TestRequest().principal.id, u"I found a typo.", self.root['foo2'])
+        pagelet = worklist.WorkListTable(self.worklist, TestRequest())
+        pagelet.update()
+        self.assertTrue(isinstance(pagelet.render(), unicode))
+        
+    def test_ItemInSimilarWorkItemsTable(self):
+        from quotationtool.workflow.browser import worklist
+        startMessage(TestRequest().principal.id, u"I found a typo.", self.root['foo2'])
+        startMessage(TestRequest().principal.id, u"I found a typo.", self.root['foo2'])
+        item = self.worklist.pop()
+        view = worklist.SimilarWorkItemsTable(item, TestRequest())
+        self.assertTrue(isinstance(view(), unicode))
+
+
 class ListWorkListsTests(PlacelessSetup, unittest.TestCase):
 
     def setUp(self):
@@ -336,6 +436,7 @@ class WorkflowHistoryTests(PlacelessSetup, unittest.TestCase):
 def test_suite():
     return unittest.TestSuite((
             unittest.makeSuite(RemoveTests),
+            unittest.makeSuite(MessageTests),
             unittest.makeSuite(ListWorkListsTests),
             unittest.makeSuite(WorkListTests),
             unittest.makeSuite(WorkflowHistoryTests),

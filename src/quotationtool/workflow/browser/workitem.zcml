@@ -1,0 +1,50 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:browser="http://namespaces.zope.org/browser"
+    xmlns:z3c="http://namespaces.zope.org/z3c"
+    >
+
+  <z3c:macro
+      name="workitem-info"
+      template="macros.pt"
+      macro="workitem-info"
+      layer="quotationtool.skin.interfaces.IQuotationtoolBrowserLayer"
+      />
+
+  <z3c:macro
+      name="similar-work-items"
+      template="macros.pt"
+      macro="similar-work-items"
+      layer="quotationtool.skin.interfaces.IQuotationtoolBrowserLayer"
+      />
+
+  <z3c:macro
+      name="workitem-relations"
+      template="macros.pt"
+      macro="workitem-relations"
+      layer="quotationtool.skin.interfaces.IQuotationtoolBrowserLayer"
+      />
+
+  <z3c:macro
+      name="workitem-object"
+      template="macros.pt"
+      macro="workitem-object"
+      layer="quotationtool.skin.interfaces.IQuotationtoolBrowserLayer"
+      />
+
+  <z3c:macro
+      name="workitem-history"
+      template="macros.pt"
+      macro="workitem-history"
+      layer="quotationtool.skin.interfaces.IQuotationtoolBrowserLayer"
+      />
+
+  <z3c:macro
+      name="workitem-message"
+      template="macros.pt"
+      macro="workitem-message"
+      layer="quotationtool.skin.interfaces.IQuotationtoolBrowserLayer"
+      />
+
+</configure>
+

@@ -5,17 +5,17 @@
     >
 
   <view
-      for="..remove.RemoveWorkItem"
+      for="..message.MessageWorkItem"
       name="label"
       type="quotationtool.skin.interfaces.IQuotationtoolBrowserLayer"
-      factory=".remove.RemoveWorkItemLabel"
+      factory=".message.MessageWorkItemLabel"
       permission="zope.View"
       />
 
   <browser:viewlet
-      name="remove-itemaction"
-      for="..interfaces.IRemovable"
-      class=".remove.RemoveItemAction"
+      name="message-itemaction"
+      for="..interfaces.ISubjectOfMessage"
+      class=".message.MessageItemAction"
       permission="quotationtool.workflow.Contribute"
       manager="quotationtool.skin.interfaces.IItemActions"
       layer="quotationtool.skin.interfaces.IQuotationtoolBrowserLayer"
@@ -23,36 +23,36 @@
       />
       
   <z3c:pagelet
-      for="..interfaces.IRemovable"
-      name="remove.html"
-      class=".remove.RemoveRequestForm"
+      for="..interfaces.ISubjectOfMessage"
+      name="message.html"
+      class=".message.MessageRequestForm"
       permission="quotationtool.workflow.Contribute"
       layer="quotationtool.skin.interfaces.IQuotationtoolBrowserLayer"
       />
 
   <z3c:pagelet
-      for="..interfaces.IRemovable"
-      name="removeProcessStarted.html"
-      class=".remove.RemoveProcessStarted"
+      for="..interfaces.ISubjectOfMessage"
+      name="messageProcessStarted.html"
+      class=".message.MessageProcessStarted"
       permission="quotationtool.workflow.Contribute"
       layer="quotationtool.skin.interfaces.IQuotationtoolBrowserLayer"
       />
   <z3c:template
-      for=".remove.RemoveProcessStarted"
-      template="remove_process_started.pt"
+      for=".message.MessageProcessStarted"
+      template="message_process_started.pt"
       layer="quotationtool.skin.interfaces.IQuotationtoolBrowserLayer"
       />
 
   <z3c:pagelet
-      for="..remove.RemoveWorkItem"
+      for="..message.MessageWorkItem"
       name="index.html"
-      class=".remove.RemoveEditorialReview"
+      class=".message.MessageEditorialReview"
       permission="quotationtool.workflow.DoEditorialReview"
       layer="quotationtool.skin.interfaces.IQuotationtoolBrowserLayer"
       />
   <z3c:template
-      for=".remove.RemoveEditorialReview"
-      template="remove.pt"
+      for=".message.MessageEditorialReview"
+      template="message.pt"
       layer="quotationtool.skin.interfaces.IQuotationtoolBrowserLayer"
       />
 

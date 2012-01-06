@@ -11,56 +11,57 @@ from zope.publisher.browser import BrowserView
 from z3c.ptcompat import ViewPageTemplateFile
 from zope.app.pagetemplate.viewpagetemplatefile import ViewPageTemplateFile as ViewletPageTemplateFile
 from zope.viewlet.viewlet import ViewletBase
+from cgi import escape
 
 from quotationtool.skin.interfaces import ITabbedContentLayout
 
 from quotationtool.workflow import interfaces
 from quotationtool.workflow.interfaces import _
 from quotationtool.workflow.history import UserNotation
+from quotationtool.workflow.browser import common
 
-
-comment = zope.schema.Text(
-    title=_('remove-comment-title',
+message = zope.schema.Text(
+    title=_('message-message-title',
             u"Message"),
-    description=_('remove-comment-desc',
-                  u"Why you want the item to be deleted? Please provide a short message to the editorial staff."),
+    description=_('message-message-desc',
+                  u"Please enter the message you want to send to the editorial staff."),
     required=True,
     )
-comment.__name__ = 'workflow-message'
+message.__name__ = 'workflow-message'
 
-review_comment = zope.schema.Text(
-    title=_('removereview-comment-title',
-            u"Comment"),
-    description=_('removereview-comment-desc',
-                  u"Please give a short comment on your decision, especially if you reject the remove request."),
-    required=False,
+answer = zope.schema.Text(
+    title=_('message-answer-title',
+            u"Answer"),
+    description=_('message-answer-desc',
+                  u"Please give a (short) answer to the message."),
+    required=True,
     )
-review_comment.__name__ = 'workflow-message'
+answer.__name__ = 'workflow-message'
 
-class RemoveRequestForm(form.Form):
+class MessageRequestForm(form.Form):
 
     implements(ITabbedContentLayout)
 
-    label = _('removerequestform-label',
-              u"Remove database item")
+    label = _('messagerequestform-label',
+              u"Message about database item")
 
-    info = _('removerequestform-info',
-             u"The decision if an item is removed or not will be made by the site's editors. You can ask them to remove this item with the form below. Please give a short reason, why it should be removed.")
+    info = _('messagerequestform-info',
+             u"Using the form below you can send a message to the editorial staff. It should be about this database item. May be you found a typo or an other mistake, want changes to be made. The site's editors will read your message and decide what to do. You can read their answer by visiting the tab called 'Workflow' under this database item.")
 
-    process_id = 'quotationtool.remove'
+    process_id = 'quotationtool.message'
 
     @property
     def action(self):
         """See interfaces.IInputForm"""
         return self.request.getURL() + u"#tabs"
 
-    fields = field.Fields(comment)
+    fields = field.Fields(message)
 
     ignoreContext = True
     ignoreReadonly = True
 
-    @button.buttonAndHandler(_(u"Remove"), name='remove')
-    def handleRemove(self, action):
+    @button.buttonAndHandler(_(u"Send"), name='send')
+    def handleSend(self, action):
         data, errors = self.extractData()
         if errors:
             self.status = self.formErrorsMessage
@@ -74,6 +75,7 @@ class RemoveRequestForm(form.Form):
         # TODO: Note that we have to remove the security proxy!
         proc.start(getattr(principal, 'id', u"Unkown"),
                    datetime.datetime.now(),
+                   data['workflow-message'],
                    removeAllProxies(history),
                    removeAllProxies(self.context) 
                    )
@@ -81,7 +83,7 @@ class RemoveRequestForm(form.Form):
                 getattr(principal, 'id', u"Unknown"),
                 data['workflow-message']
                 ))
-        #self.template = ViewPageTemplateFile('remove_process_started.pt')
+        #self.template = ViewPageTemplateFile('message_process_started.pt')
         self.request.response.redirect(self.nextURL())
 
     @button.buttonAndHandler(_(u"Cancel"), name="cancel")
@@ -90,36 +92,36 @@ class RemoveRequestForm(form.Form):
         self.request.response.redirect(url)
 
     def nextURL(self):
-        return absoluteURL(self.context, self.request) + u"/@@removeProcessStarted.html#tabs"
+        return absoluteURL(self.context, self.request) + u"/@@messageProcessStarted.html#tabs"
 
 
-class RemoveProcessStarted(BrowserPagelet):
-    """ Notification that the removal process started."""
+class MessageProcessStarted(BrowserPagelet):
+    """ Notification that the message process started."""
 
     implements(ITabbedContentLayout)
 
 
-class RemoveWorkItemLabel(BrowserView):
+class MessageWorkItemLabel(BrowserView):
     """ Label for work item."""
 
     def __call__(self):
-        return _('remove-workitem-label',
-                 u"Remove")
+        return _('message-workitem-label',
+                 u"Message")
 
-class RemoveEditorialReview(form.Form):
+class MessageEditorialReview(form.Form):
     
     implements(interfaces.IWorkItemForm)
 
-    fields = field.Fields(review_comment)
+    fields = field.Fields(answer)
 
-    label = _('removeeditorialreview-label', u"Editorial Review on Remove Request")
+    label = _('messageeditorialreview-label', u"Editorial Review of Message")
 
-    info = _('removeeditorialreview-info', u"You can either accept the request, reject it or postpone your decision.")
+    info = _('messageeditorialreview-info', u"Please write an answer to the user's message about the item.")
 
     ignoreContext = True
     ignoreReadonly = True
 
-    def _handle(self, remove):
+    def _handle(self, answr):
         data, errors = self.extractData()
         if errors:
             self.status = self.formErrorsMessage
@@ -131,16 +133,12 @@ class RemoveEditorialReview(form.Form):
                 data['workflow-message']))
         #get next URL before removing work item
         url = self.nextURL()
-        self.context.finish(remove)
+        self.context.finish(answr, data['workflow-message'])
         self.request.response.redirect(url)
 
-    @button.buttonAndHandler(_(u"Remove"), name="remove")
-    def handleRemove(self, action):
-        self._handle('remove')
-        
-    @button.buttonAndHandler(_(u"Reject"), name="reject")
-    def handleReject(self, action):
-        self._handle('reject')
+    @button.buttonAndHandler(_(u"Answer"), name="answer")
+    def handleAnswer(self, action):
+        self._handle('answer')
         
     @button.buttonAndHandler(_(u"Postpone"), name="postpone")
     def handlePostpone(self, action):
@@ -153,10 +151,16 @@ class RemoveEditorialReview(form.Form):
     def nextURL(self):
         return absoluteURL(self.context.__parent__, self.request)
 
+    def contributor(self):
+        return common.getPrincipalTitle(self.context.contributor)
 
-class RemoveItemAction(ViewletBase):
+    def message(self):
+        return escape(self.context.message).replace('\n', '<br />')
+
+
+class MessageItemAction(ViewletBase):
     
-    template = ViewletPageTemplateFile('remove_action.pt')
+    template = ViewletPageTemplateFile('message_action.pt')
 
     def render(self):
         return self.template()

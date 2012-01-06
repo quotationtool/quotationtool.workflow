@@ -1,0 +1,6 @@
+<div class="itemaction message-action" i18n:domain="quotationtool">
+  <a class="internal itemaction" href="@@message.html#tabs"
+     tal:attributes="href string:${context/@@absolute_url}/@@message.html#tabs"
+     ><img src="" alt="Message" i18n:attributes="alt message-action"/>
+  </a>
+</div>

@@ -1,0 +1,74 @@
+<metal:block 
+    xmlns:tal="http://xml.zope.org/namespaces/tal"
+    xmlns:metal="http://xml.zope.org/namespaces/metal"
+    xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+    i18n:domain="quotationtool">
+
+    <div class="form-info" metal:define-macro="workitem-info"
+         tal:condition="view/info|nothing">
+      <span class="form-info-label" 
+            i18n:translate="form-info">Note: </span>
+      <span i18n:translate=""
+         tal:content="structure view/info|nothing">info</span>
+    </div>
+
+    <div metal:define-macro="similar-work-items" 
+	tal:condition="python:len(list(context.getSimilarWorkItems()))>0" 
+	class="similar-work-items">
+      <p i18n:translate="">
+	<b>Attention:</b> The database item is relevant for <span
+	i18n:name="COUNT"
+	tal:content="python:len(list(context.getSimilarWorkItems()))"
+	>5</span> other workflow processes, too. You will not be able
+	to remove it before these other processes are finished.
+      </p>
+      <div tal:content="structure context/@@similar_work_items"/>
+    </div>
+
+    <div metal:define-macro="workitem-relations" 
+	class="workitem-relations" 
+	tal:condition="context/findRelationTokens">
+      <p i18n:translate="">
+	<b>Attention:</b> The database item has still relations to
+	other items. Make sure that there are no relations before
+	removing it.
+      </p>
+    </div>
+    
+    <div metal:define-macro="workitem-object" 
+	class="workitem-object">
+      <h3 i18n:translate="">Database Item:</h3>
+      <div class="details" tal:content="structure context/object_/@@details"/>
+      <div class="object-link">
+	<a class="internal" href=""
+	   tal:attributes="href context/object_/@@absolute_url"
+	   tal:content="context/object_/@@label">Label</a>
+      </div>
+    </div>
+
+    <div metal:define-macro="workitem-history" 
+	class="workitem-workflow-history">
+      <h3 i18n:translate="">Workflow History (reversed order)</h3>
+      <div class="workflow-history">
+	<div tal:repeat="notation context/history/reverse" 
+	     tal:content="structure notation/@@details">
+	</div>
+      </div>
+    </div>
+
+    <div metal:define-macro="workitem-message"
+	class="workitem-message">
+      <h3 i18n:translate="">Message</h3>
+      <div class="user" i18n:translate="">
+	<span i18n:name="USER" tal:content="view/contributor|default"
+	><tal:block content="context/contributor|default">[An unkown
+	user]</tal:block></span> says:
+      </div>
+      <div class="message" tal:content="view/message|default">
+	<tal:block content="context/message|nothing">
+	  [Unkown message]
+	</tal:block>
+      </div>
+    </div>
+
+</metal:block>

@@ -21,5 +21,6 @@
   <include package="z3c.menu.ready2go"/>
   <include package="z3c.table"/>
   <include package="zope.app.pagetemplate"/>
+  <include package="z3c.macro"/>
 
 </configure>
