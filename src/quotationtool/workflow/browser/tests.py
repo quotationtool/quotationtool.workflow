@@ -114,7 +114,7 @@ class TestRequest(zope.publisher.browser.TestRequest):
     principal = Principal('testing')
 
 
-def startRemove(contributor, obj):
+def startRemove(contributor, obj, message=u"It's a foolisch item!"):
     """ Helper that starts remove workflow process."""
     from quotationtool.workflow.interfaces import IWorkflowHistory
     history = IWorkflowHistory(obj)
@@ -122,7 +122,7 @@ def startRemove(contributor, obj):
     from zope.wfmc.interfaces import IProcessDefinition
     pd = zope.component.getUtility(IProcessDefinition, 'quotationtool.remove')
     proc = pd()
-    proc.start(contributor, datetime.datetime.now(), history, obj)
+    proc.start(contributor, datetime.datetime.now(), message, history, obj)
 
 
 class RemoveTests(PlacelessSetup, unittest.TestCase):

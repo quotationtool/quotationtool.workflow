@@ -71,6 +71,15 @@
       />
 
   <adapter
+      name="processstarted"
+      for="*
+           quotationtool.skin.interfaces.IQuotationtoolBrowserLayer
+           .worklist.IWorkListTable"
+      provides="z3c.table.interfaces.IColumn"
+      factory=".worklist.ProcessStartedColumn"
+      />
+
+  <adapter
       name="process"
       for="*
            quotationtool.skin.interfaces.IQuotationtoolBrowserLayer
@@ -81,7 +90,7 @@
 
   <adapter
       name="workitem"
-      for="*
+      for="..interfaces.IHasWorkflowHistory
            quotationtool.skin.interfaces.IQuotationtoolBrowserLayer
            .worklist.IWorkListTable"
       provides="z3c.table.interfaces.IColumn"
@@ -115,6 +124,21 @@
       factory=".worklist.LastActivityColumn"
       />
 
+  <adapter
+      name="object"
+      for="..interfaces.IWorkList
+           quotationtool.skin.interfaces.IQuotationtoolBrowserLayer
+           .worklist.IWorkListTable"
+      provides="z3c.table.interfaces.IColumn"
+      factory=".worklist.ObjectLabelColumn"
+      />
 
+  <z3c:pagelet
+      for="..interfaces.IWorkList"
+      name="meta.html"
+      class=".worklist.EditMeta"
+      layer="quotationtool.skin.interfaces.IQuotationtoolBrowserLayer"
+      permission="quotationtool.workflow.ManageWorkflow"
+      />
 
 </configure>

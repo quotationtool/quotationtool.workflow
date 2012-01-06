@@ -66,11 +66,12 @@ True
 The start method takes formal parameters:
 1) The user-id of the user who asks the object to be removed.
 2) The time of the process is started.
-3) The workflow history. 
-4) The object which is asked to be removed. It is expected to 
+3) A message why the item should be removed.
+4) The workflow history. 
+5) The object which is asked to be removed. It is expected to 
    implement zope.location.interfaces.IContained.
 
->>> proc.start('chris', datetime.datetime.now(), None, foo)
+>>> proc.start('chris', datetime.datetime.now(), u"It's a foolisch item.", None, foo)
 ProcessStarted(Process('quotationtool.remove'))
 Transition(None, Activity('quotationtool.remove.start'))
 ActivityStarted(Activity('quotationtool.remove.start'))
@@ -135,10 +136,10 @@ would break these other workflow processes.
 True
 
 >>> proc1 = pd()
->>> proc1.start('chris', datetime.datetime.now(), None, bar)
+>>> proc1.start('chris', datetime.datetime.now(), u"It's a foolisch item.", None, bar)
 
 >>> proc2 = pd()
->>> proc2.start('bob', datetime.datetime.now(), None, bar)
+>>> proc2.start('bob', datetime.datetime.now(), u"It's a foolisch item", None, bar)
 
 >>> item = editor_items.pop()
 
@@ -232,7 +233,7 @@ True
 
 
 >>> proc = pd()
->>> proc.start('jonathan', datetime.datetime.now(), None, foo)
+>>> proc.start('jonathan', datetime.datetime.now(), u"It's a foolisch item.", None, foo)
 >>> item = editor_items.pop()
 
 

@@ -93,13 +93,14 @@ parameters:
 The start method takes formal parameters:
 1) The user-id of the user who asks the object to be removed.
 2) The time of the process is started.
-3) The workflow history. 
-4) The object which is asked to be removed. It is expected to 
+3) A message why the item should be removed.
+4) The workflow history. 
+5) The object which is asked to be removed. It is expected to 
    implement zope.location.interfaces.IContained.
 
 >>> proc = pd()
 >>> import datetime
->>> proc.start('chris', datetime.datetime.now(), history, foo)
+>>> proc.start('chris', datetime.datetime.now(), u"This is a foolisch item.", history, foo)
 <...
 ProcessStarted(Process('quotationtool.remove'))...
 Transition(None, Activity('quotationtool.remove.start'))...

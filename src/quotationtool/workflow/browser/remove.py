@@ -11,12 +11,14 @@ from zope.publisher.browser import BrowserView
 from z3c.ptcompat import ViewPageTemplateFile
 from zope.app.pagetemplate.viewpagetemplatefile import ViewPageTemplateFile as ViewletPageTemplateFile
 from zope.viewlet.viewlet import ViewletBase
+from cgi import escape
 
 from quotationtool.skin.interfaces import ITabbedContentLayout
 
 from quotationtool.workflow import interfaces
 from quotationtool.workflow.interfaces import _
 from quotationtool.workflow.history import UserNotation
+from quotationtool.workflow.browser import common
 
 
 comment = zope.schema.Text(
@@ -74,6 +76,7 @@ class RemoveRequestForm(form.Form):
         # TODO: Note that we have to remove the security proxy!
         proc.start(getattr(principal, 'id', u"Unkown"),
                    datetime.datetime.now(),
+                   data['workflow-message'],
                    removeAllProxies(history),
                    removeAllProxies(self.context) 
                    )
@@ -104,7 +107,7 @@ class RemoveWorkItemLabel(BrowserView):
 
     def __call__(self):
         return _('remove-workitem-label',
-                 u"Remove")
+                 u"Editorial Review")
 
 class RemoveEditorialReview(form.Form):
     
@@ -152,6 +155,12 @@ class RemoveEditorialReview(form.Form):
 
     def nextURL(self):
         return absoluteURL(self.context.__parent__, self.request)
+
+    def contributor(self):
+        return common.getPrincipalTitle(self.context.contributor)
+
+    def message(self):
+        return escape(self.context.message).replace('\n', '<br />')
 
 
 class RemoveItemAction(ViewletBase):

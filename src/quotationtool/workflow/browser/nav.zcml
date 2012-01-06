@@ -38,6 +38,15 @@
            .nav.IWorkFlowContainerMainNavItem"
       provides="z3c.menu.ready2go.interfaces.ISelectedChecker"
       />
+  <zope:adapter
+      factory="z3c.menu.ready2go.checker.TrueSelectedChecker"
+      for="zope.wfmc.interfaces.IWorkItem
+           quotationtool.skin.interfaces.IQuotationtoolBrowserLayer
+           ..interfaces.IWorkItemForm
+           quotationtool.skin.interfaces.IMainNav
+           .nav.IWorkFlowContainerMainNavItem"
+      provides="z3c.menu.ready2go.interfaces.ISelectedChecker"
+      />
 
   <browser:viewletManager
       name="workflowcontainersubnav"

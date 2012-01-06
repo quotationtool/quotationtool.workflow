@@ -172,4 +172,4 @@ class INotation(zope.interface.Interface):
 
 
 class IWorkItemForm(zope.interface.Interface):
-    """ A form for managing work items"""
+    """ A form for managing work items."""

@@ -19,6 +19,11 @@
 
   <grant
       permission="quotationtool.workflow.ManageWorkflow"
+      role="quotationtool.Creator"
+      />
+
+  <grant
+      permission="quotationtool.workflow.ManageWorkflow"
       role="quotationtool.Editor"
       />
 
@@ -39,17 +44,27 @@
 
   <grant
       permission="quotationtool.workflow.ReadHistory"
+      role="quotationtool.Visitor"
+      />
+
+  <grant
+      permission="quotationtool.workflow.ReadHistory"
+      role="quotationtool.Member"
+      />
+
+  <grant
+      permission="quotationtool.workflow.ReadHistory"
+      role="quotationtool.Creator"
+      />
+
+  <grant
+      permission="quotationtool.workflow.ReadHistory"
       role="quotationtool.Editor"
       />
 
   <grant
       permission="quotationtool.workflow.ReadHistory"
       role="quotationtool.Manager"
-      />
-
-  <grant
-      permission="quotationtool.workflow.ReadHistory"
-      role="quotationtool.Creator"
       />
 
 </configure>

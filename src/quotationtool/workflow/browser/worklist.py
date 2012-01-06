@@ -8,6 +8,8 @@ from zope.dublincore.interfaces import IZopeDublinCore
 from zope.publisher.browser import BrowserView
 from zope.i18n import translate
 from zope.app.pagetemplate.viewpagetemplatefile import ViewPageTemplateFile
+from z3c.form import field
+from z3c.formui import form
 
 from quotationtool.workflow.interfaces import _
 from quotationtool.workflow import interfaces
@@ -88,6 +90,18 @@ class ISortingColumn(Interface):
     """ A sorting column."""
 
 
+class ProcessStartedColumn(column.Column):
+
+    implements(ISortingColumn)
+
+    header = _('processstarted-column-header',
+               u"Process Started")
+    weight = 90
+
+    def renderCell(self, item):
+        return getattr(item, 'starttime', _(u"Unknown"))
+
+
 class ProcessColumn(column.Column):
 
     implements(ISortingColumn)
@@ -126,7 +140,7 @@ class ContributorColumn(column.Column):
     implements(ISortingColumn)
 
     header = _('contributor-column-header', u"Started By")
-    weight = 200
+    weight = 105
 
     def renderCell(self, item):
         contributor = getattr(item, 'contributor', u'Unkown')
@@ -185,3 +199,39 @@ class LastActivityColumn(column.LinkColumn):
                u"Last Activity")
 
     weight = 220
+
+
+class ObjectLabelColumn(column.Column):
+    """Column displaying the label of the object under workflow
+    control."""
+
+    zope.interface.implements(ISortingColumn)
+
+    header = _('object-column-header',
+               u"Database item")
+    weight = 108
+
+    def renderCell(self, item):
+        obj = getattr(item, 'object_', None)
+        if obj is None:
+            return _(u"Unkown")
+        label =  zope.component.getMultiAdapter(
+            (obj, self.request), name='label')()
+        try:
+            return translate(label, context=self.request)
+        except Exception:
+            return label
+
+
+class EditMeta(form.EditForm):
+
+    fields = field.Fields(IZopeDublinCore).select('title', 'description')
+
+    label = _('edit-meta-label', u"Metadata")
+
+    info = _('edit-meta-info',
+             u"You can edit the descriptive metadata of the worklist.")
+
+    def getContent(self):
+        return IZopeDublinCore(self.context, None)
+

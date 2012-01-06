@@ -106,7 +106,7 @@ class MessageWorkItemLabel(BrowserView):
 
     def __call__(self):
         return _('message-workitem-label',
-                 u"Message")
+                 u"Editorial Review")
 
 class MessageEditorialReview(form.Form):
     

@@ -35,12 +35,13 @@ class RemoveWorkItem(WorkItemBase, SimilarWorkItemsMixin):
                 relations = TreeSet(union(relations, rels))
         return relations
 
-    def start(self, contributor, starttime, history, object_):
+    def start(self, contributor, starttime, message, history, object_):
         """Parameters: 
         object_: object to be removed. 
         history: the workflow history of this object."""
         self.contributor = contributor
         self.starttime = starttime
+        self.message = message
         self.object_ = object_
         self.history = history
         # assert that object is removable, i.e. implements IRemovable

@@ -71,6 +71,12 @@
                     </xpdl:DataType>
                     <xpdl:Description>Timestamp when the workflow process was started.</xpdl:Description>
                 </xpdl:FormalParameter>
+                <xpdl:FormalParameter Id="message" IsArray="false" Mode="IN" Name="Message">
+                    <xpdl:DataType>
+                        <xpdl:BasicType Type="STRING"/>
+                    </xpdl:DataType>
+                    <xpdl:Description>Message saying why the item should be removed.</xpdl:Description>
+                </xpdl:FormalParameter>
                 <xpdl:FormalParameter Id="history" IsArray="false" Mode="IN" Name="History">
                     <xpdl:DataType>
                         <xpdl:BasicType Type="STRING"/>
@@ -101,6 +107,12 @@
                             <xpdl:DataType>
                                 <xpdl:BasicType Type="STRING"/>
                             </xpdl:DataType>
+                        </xpdl:FormalParameter>
+                        <xpdl:FormalParameter Id="message" IsArray="false" Mode="IN" Name="Message">
+                            <xpdl:DataType>
+                                <xpdl:BasicType Type="STRING"/>
+                            </xpdl:DataType>
+                            <xpdl:Description>Message saying why the item should be removed.</xpdl:Description>
                         </xpdl:FormalParameter>
                         <xpdl:FormalParameter Id="history" IsArray="false" Mode="INOUT" Name="History">
                             <xpdl:DataType>
@@ -168,6 +180,7 @@
                                     <xpdl:ActualParameter>remove</xpdl:ActualParameter>
                                     <xpdl:ActualParameter>contributor</xpdl:ActualParameter>
                                     <xpdl:ActualParameter>starttime</xpdl:ActualParameter>
+                                    <xpdl:ActualParameter>message</xpdl:ActualParameter>
                                     <xpdl:ActualParameter>history</xpdl:ActualParameter>
                                     <xpdl:ActualParameter>object</xpdl:ActualParameter>
                                 </xpdl:ActualParameters>

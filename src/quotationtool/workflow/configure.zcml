@@ -116,7 +116,7 @@
     <implements
 	interface="zope.annotation.interfaces.IAttributeAnnotatable"/>
     <allow
-	attributes="start contributor starttime object_ history findRelationTokens"/>
+	attributes="start contributor starttime message object_ history findRelationTokens"/>
     <require
 	attributes="finish"
 	permission="quotationtool.workflow.DoEditorialReview"

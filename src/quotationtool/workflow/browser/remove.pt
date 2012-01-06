@@ -6,6 +6,7 @@
     <div metal:use-macro="macro:workitem-history"/>
     <div metal:use-macro="macro:similar-work-items"/>
     <div metal:use-macro="macro:workitem-relations"/>
+    <div metal:use-macro="macro:workitem-message"/>
   </div>
 
   <metal:slot fill-slot="main">
