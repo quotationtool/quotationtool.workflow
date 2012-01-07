@@ -9,6 +9,11 @@ class MessageWorkItem(WorkItemBase, SimilarWorkItemsMixin):
     """ Work item (application) for review activity in a
     quotationtool.message workflow."""
 
+    implements(interfaces.IStandardParameters,
+               interfaces.IObjectParameter)
+
+    contributor = starttime = message = history = object_ = None 
+
     oid_attributes = ('object_', )
 
     schema = interfaces.IMessageSchema

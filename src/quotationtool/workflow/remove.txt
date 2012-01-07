@@ -118,6 +118,47 @@ Remove simple logger from subscriber list.
 Restrictions
 ~~~~~~~~~~~~
 
+Fixation
+++++++++
+
+>>> from quotationtool.workflow.interfaces import IFixed
+
+>>> container['foo'] = foo = Foo()
+>>> zope.interface.directlyProvides(foo, IFixed)
+
+>>> proc = pd()
+>>> proc.start('bob', datetime.datetime.now(), u"It's a foolisch item", None, foo)
+Traceback (most recent call last):
+...
+ProcessError: ifixed-provided
+
+
+Better clean up:
+>>> del container['foo']
+
+
+The IFixed interface may be slammed on the object while the process
+was already running. 
+
+>>> container['bar'] = bar = Foo()
+
+>>> proc = pd()
+>>> proc.start('bob', datetime.datetime.now(), u"It's a foolisch item", None, bar)
+
+>>> zope.interface.directlyProvides(bar, IFixed)
+
+>>> item = editor_items.pop()
+>>> item.finish('remove')
+Traceback (most recent call last):
+...
+ProcessError: ifixed-provided
+
+
+
+Clean up:
+>>> del container['bar']
+
+
 Similar items
 +++++++++++++
 

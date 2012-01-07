@@ -13,6 +13,11 @@ from quotationtool.workflow.workitem import WorkItemBase, SimilarWorkItemsMixin
 class RemoveWorkItem(WorkItemBase, SimilarWorkItemsMixin):
     """ Application to remove a database item."""
 
+    zope.interface.implements(interfaces.IStandardParameters,
+                              interfaces.IObjectParameter)
+
+    contributor = starttime = message = history = object_ = None 
+
     worklist = 'editor' # fix worklist!
 
     oid_attributes = ('object_',) # see ISimilarWorkItems
@@ -48,13 +53,18 @@ class RemoveWorkItem(WorkItemBase, SimilarWorkItemsMixin):
         if not interfaces.IRemovable.providedBy(object_):
             raise ProcessError(_(
                     'iremovable-not-provided',
-                    u"Unremovable Object. (IRemovable interface not provided.)"
+                    u"Unremovable database item. (IRemovable interface not provided.)"
+                    ))
+        if interfaces.IFixed.providedBy(object_):
+            raise ProcessError(_(
+                    'ifixed-provided',
+                    u"Database item is fixed and can't be removed."
                     ))
         #TODO: add some more ways to remove the object
         if not (IContained.providedBy(object_) or 1==2):
             raise ProcessError(_(
                     'wfmc-remove-unremovable',
-                    u"Unremovable Object. (Could not determine a way who to remove item.)"
+                    u"Unremovable database item. (Could not determine a way who to remove item.)"
                     ))
         self._appendToWorkList()
             
@@ -62,6 +72,14 @@ class RemoveWorkItem(WorkItemBase, SimilarWorkItemsMixin):
         self.schema['remove'].validate(remove)
 
         if remove=='remove':
+
+            # assert that the item is still not fixed.
+            if interfaces.IFixed.providedBy(self.object_):
+                raise ProcessError(_(
+                        'ifixed-provided',
+                        u"Database item is fixed and can't be removed."
+                        ))
+
             # assert that the item asked to be removed is not under
             # control of other workflow processes
             similars = [item for item in self.getSimilarWorkItems()]
