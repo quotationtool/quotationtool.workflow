@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xpdl:Package xmlns:xpdl="http://www.wfmc.org/2008/XPDL2.1" xmlns="http://www.wfmc.org/2008/XPDL2.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Id="quotationtool" Name="Quotationtool" xsi:schemaLocation="http://www.wfmc.org/2008/XPDL2.1 http://www.wfmc.org/standards/docs/bpmnxpdl_31.xsd">
+    <xpdl:PackageHeader>
+        <xpdl:XPDLVersion>2.1</xpdl:XPDLVersion>
+        <xpdl:Vendor>quotationtool.org</xpdl:Vendor>
+        <xpdl:Created>2011-11-18 09:47:48</xpdl:Created>
+    </xpdl:PackageHeader>
+    <xpdl:RedefinableHeader PublicationStatus="UNDER_TEST">
+        <xpdl:Author>Christian Lück</xpdl:Author>
+    </xpdl:RedefinableHeader>
+    <xpdl:ConformanceClass GraphConformance="NON_BLOCKED"/>
+    <xpdl:Participants>
+        <xpdl:Participant Id="contributor" Name="Contributor">
+            <xpdl:ParticipantType Type="ROLE"/>
+            <xpdl:Description>Contributor/Author of the article</xpdl:Description>
+        </xpdl:Participant>
+        <xpdl:Participant Id="editor" Name="Editor">
+            <xpdl:ParticipantType Type="ROLE"/>
+            <xpdl:Description>Makes an editorial review of the article, rejects or publishes</xpdl:Description>
+        </xpdl:Participant>
+        <xpdl:Participant Id="system" Name="System">
+            <xpdl:ParticipantType Type="SYSTEM"/>
+            <xpdl:Description>Automatic</xpdl:Description>
+        </xpdl:Participant>
+    </xpdl:Participants>
+    <xpdl:Pools>
+        <xpdl:Pool BoundaryVisible="true" Id="quotationtool_pool1" MainPool="true" Name="Fixate" Orientation="HORIZONTAL" Process="fixate">
+            <xpdl:Lanes>
+                <xpdl:Lane Id="quotationtool_pool1_lan1" Name="Contributor">
+                    <xpdl:NodeGraphicsInfos>
+                        <xpdl:NodeGraphicsInfo BorderColor="0,0,0" FillColor="220,220,220" IsVisible="true" ToolId="JaWE"/>
+                        <xpdl:NodeGraphicsInfo BorderColor="0,0,0" FillColor="220,220,220" IsVisible="true" ToolId="JaWE"/>
+                    </xpdl:NodeGraphicsInfos>
+                    <xpdl:Performers>
+                        <xpdl:Performer>contributor</xpdl:Performer>
+                    </xpdl:Performers>
+                </xpdl:Lane>
+                <xpdl:Lane Id="quotationtool_pool1_lan3" Name="Editor">
+                    <xpdl:NodeGraphicsInfos>
+                        <xpdl:NodeGraphicsInfo BorderColor="0,0,0" FillColor="220,220,220" IsVisible="true" ToolId="JaWE"/>
+                        <xpdl:NodeGraphicsInfo BorderColor="0,0,0" FillColor="220,220,220" IsVisible="true" ToolId="JaWE"/>
+                    </xpdl:NodeGraphicsInfos>
+                    <xpdl:Performers>
+                        <xpdl:Performer>editor</xpdl:Performer>
+                    </xpdl:Performers>
+                </xpdl:Lane>
+            </xpdl:Lanes>
+            <xpdl:NodeGraphicsInfos>
+                <xpdl:NodeGraphicsInfo BorderColor="0,0,0" FillColor="255,255,215" IsVisible="true" ToolId="JaWE"/>
+            </xpdl:NodeGraphicsInfos>
+        </xpdl:Pool>
+    </xpdl:Pools>
+    <xpdl:WorkflowProcesses>
+        <xpdl:WorkflowProcess AccessLevel="PUBLIC" Id="fixate" Name="Fixate">
+            <xpdl:ProcessHeader>
+                <xpdl:Created>2011-12-19 22:49:22</xpdl:Created>
+            </xpdl:ProcessHeader>
+            <xpdl:RedefinableHeader PublicationStatus="UNDER_TEST">
+                <xpdl:Author>Christian Lück</xpdl:Author>
+            </xpdl:RedefinableHeader>
+            <xpdl:FormalParameters>
+                <xpdl:FormalParameter Id="contributor" IsArray="false" Mode="IN" Name="Contributor">
+                    <xpdl:DataType>
+                        <xpdl:BasicType Type="STRING"/>
+                    </xpdl:DataType>
+                    <xpdl:Description>The user who queries for removing the item.</xpdl:Description>
+                </xpdl:FormalParameter>
+                <xpdl:FormalParameter Id="starttime" IsArray="false" Mode="IN" Name="Starttime">
+                    <xpdl:DataType>
+                        <xpdl:BasicType Type="STRING"/>
+                    </xpdl:DataType>
+                    <xpdl:Description>Timestamp when the workflow process was started.</xpdl:Description>
+                </xpdl:FormalParameter>
+                <xpdl:FormalParameter Id="message" IsArray="false" Mode="IN" Name="Message">
+                    <xpdl:DataType>
+                        <xpdl:BasicType Type="STRING"/>
+                    </xpdl:DataType>
+                    <xpdl:Description>Message saying why the item should be fixed.</xpdl:Description>
+                </xpdl:FormalParameter>
+                <xpdl:FormalParameter Id="history" IsArray="false" Mode="IN" Name="History">
+                    <xpdl:DataType>
+                        <xpdl:BasicType Type="STRING"/>
+                    </xpdl:DataType>
+                    <xpdl:Description>Workflow history of the object asked to be fixed.</xpdl:Description>
+                </xpdl:FormalParameter>
+                <xpdl:FormalParameter Id="object" IsArray="false" Mode="IN" Name="Object">
+                    <xpdl:DataType>
+                        <xpdl:BasicType Type="STRING"/>
+                    </xpdl:DataType>
+                    <xpdl:Description>The object asked to be fixed.</xpdl:Description>
+                </xpdl:FormalParameter>
+            </xpdl:FormalParameters>
+            <xpdl:Applications>
+                <xpdl:Application Id="fixate" Name="Fixate">
+                    <xpdl:FormalParameters>
+                        <xpdl:FormalParameter Id="fixate" IsArray="false" Mode="OUT" Name="Fixate">
+                            <xpdl:DataType>
+                                <xpdl:BasicType Type="STRING"/>
+                            </xpdl:DataType>
+                        </xpdl:FormalParameter>
+                        <xpdl:FormalParameter Id="contributor" IsArray="false" Mode="IN" Name="Contributor">
+                            <xpdl:DataType>
+                                <xpdl:BasicType Type="STRING"/>
+                            </xpdl:DataType>
+                        </xpdl:FormalParameter>
+                        <xpdl:FormalParameter Id="starttime" IsArray="false" Mode="IN" Name="Starttime">
+                            <xpdl:DataType>
+                                <xpdl:BasicType Type="STRING"/>
+                            </xpdl:DataType>
+                        </xpdl:FormalParameter>
+                        <xpdl:FormalParameter Id="message" IsArray="false" Mode="IN" Name="Message">
+                            <xpdl:DataType>
+                                <xpdl:BasicType Type="STRING"/>
+                            </xpdl:DataType>
+                            <xpdl:Description>Message saying why the item should be fixed.</xpdl:Description>
+                        </xpdl:FormalParameter>
+                        <xpdl:FormalParameter Id="history" IsArray="false" Mode="INOUT" Name="History">
+                            <xpdl:DataType>
+                                <xpdl:BasicType Type="STRING"/>
+                            </xpdl:DataType>
+                        </xpdl:FormalParameter>
+                        <xpdl:FormalParameter Id="object" IsArray="false" Mode="INOUT" Name="Object">
+                            <xpdl:DataType>
+                                <xpdl:BasicType Type="STRING"/>
+                            </xpdl:DataType>
+                        </xpdl:FormalParameter>
+                    </xpdl:FormalParameters>
+                </xpdl:Application>
+            </xpdl:Applications>
+            <xpdl:DataFields>
+                <xpdl:DataField Id="fixate" IsArray="false" Name="Fixate">
+                    <xpdl:DataType>
+                        <xpdl:BasicType Type="STRING"/>
+                    </xpdl:DataType>
+                    <xpdl:Description>Can ether be fixate, reject or postpone</xpdl:Description>
+                </xpdl:DataField>
+            </xpdl:DataFields>
+            <xpdl:Activities>
+                <xpdl:Activity FinishMode="Automatic" Id="start" Name="Fixation Request" StartMode="Manual">
+                    <xpdl:Event>
+                        <xpdl:StartEvent Trigger="None"/>
+                    </xpdl:Event>
+                    <xpdl:NodeGraphicsInfos>
+                        <xpdl:NodeGraphicsInfo BorderColor="0,0,0" FillColor="102,204,51" Height="31" IsVisible="true" LaneId="quotationtool_pool1_lan1" ToolId="JaWE" Width="31">
+                            <xpdl:Coordinates XCoordinate="96" YCoordinate="67"/>
+                        </xpdl:NodeGraphicsInfo>
+                    </xpdl:NodeGraphicsInfos>
+                </xpdl:Activity>
+                <xpdl:Activity FinishMode="Manual" Id="review" Name="Editorial Review" StartMode="Automatic">
+                    <xpdl:Implementation>
+                        <xpdl:Task>
+                            <xpdl:TaskApplication Id="fixate">
+                                <xpdl:ActualParameters>
+                                    <xpdl:ActualParameter>fixate</xpdl:ActualParameter>
+                                    <xpdl:ActualParameter>contributor</xpdl:ActualParameter>
+                                    <xpdl:ActualParameter>starttime</xpdl:ActualParameter>
+                                    <xpdl:ActualParameter>message</xpdl:ActualParameter>
+                                    <xpdl:ActualParameter>history</xpdl:ActualParameter>
+                                    <xpdl:ActualParameter>object</xpdl:ActualParameter>
+                                </xpdl:ActualParameters>
+                            </xpdl:TaskApplication>
+                        </xpdl:Task>
+                    </xpdl:Implementation>
+                    <xpdl:Performers>
+                        <xpdl:Performer>editor</xpdl:Performer>
+                    </xpdl:Performers>
+                    <xpdl:TransitionRestrictions>
+                        <xpdl:TransitionRestriction>
+                            <xpdl:Join Type="Exclusive"/>
+                            <xpdl:Split Type="Parallel">
+                                <xpdl:TransitionRefs>
+                                    <xpdl:TransitionRef Id="fixate_tra3"/>
+                                    <xpdl:TransitionRef Id="fixate_tra2"/>
+                                    <xpdl:TransitionRef Id="fixate_tra4"/>
+                                </xpdl:TransitionRefs>
+                            </xpdl:Split>
+                        </xpdl:TransitionRestriction>
+                    </xpdl:TransitionRestrictions>
+                    <xpdl:NodeGraphicsInfos>
+                        <xpdl:NodeGraphicsInfo BorderColor="0,0,0" FillColor="255,204,204" Height="60" IsVisible="true" LaneId="quotationtool_pool1_lan3" ToolId="JaWE" Width="90">
+                            <xpdl:Coordinates XCoordinate="300" YCoordinate="60"/>
+                        </xpdl:NodeGraphicsInfo>
+                    </xpdl:NodeGraphicsInfos>
+                </xpdl:Activity>
+                <xpdl:Activity FinishMode="Automatic" Id="fixate" Name="Fixate" StartMode="Automatic">
+                    <xpdl:Event>
+                        <xpdl:EndEvent Result="None"/>
+                    </xpdl:Event>
+                    <xpdl:NodeGraphicsInfos>
+                        <xpdl:NodeGraphicsInfo BorderColor="0,0,0" FillColor="236,120,98" Height="31" IsVisible="true" LaneId="quotationtool_pool1_lan3" ToolId="JaWE" Width="31">
+                            <xpdl:Coordinates XCoordinate="636" YCoordinate="96"/>
+                        </xpdl:NodeGraphicsInfo>
+                    </xpdl:NodeGraphicsInfos>
+                </xpdl:Activity>
+                <xpdl:Activity FinishMode="Automatic" Id="reject" Name="Reject" StartMode="Automatic">
+                    <xpdl:Event>
+                        <xpdl:EndEvent Result="None"/>
+                    </xpdl:Event>
+                    <xpdl:NodeGraphicsInfos>
+                        <xpdl:NodeGraphicsInfo BorderColor="0,0,0" FillColor="236,120,98" Height="31" IsVisible="true" LaneId="quotationtool_pool1_lan3" ToolId="JaWE" Width="31">
+                            <xpdl:Coordinates XCoordinate="634" YCoordinate="15"/>
+                        </xpdl:NodeGraphicsInfo>
+                    </xpdl:NodeGraphicsInfos>
+                </xpdl:Activity>
+            </xpdl:Activities>
+            <xpdl:Transitions>
+                <xpdl:Transition From="start" Id="fixate_tra1" To="review">
+                    <xpdl:ConnectorGraphicsInfos>
+                        <xpdl:ConnectorGraphicsInfo FillColor="0,0,0" IsVisible="true" Style="NO_ROUTING_SPLINE" ToolId="JaWE"/>
+                    </xpdl:ConnectorGraphicsInfos>
+                </xpdl:Transition>
+                <xpdl:Transition From="review" Id="fixate_tra2" To="review">
+                    <xpdl:Condition Type="CONDITION">fixate == 'postpone'</xpdl:Condition>
+                    <xpdl:ConnectorGraphicsInfos>
+                        <xpdl:ConnectorGraphicsInfo FillColor="0,0,0" IsVisible="true" Style="NO_ROUTING_BEZIER" ToolId="JaWE">
+                            <xpdl:Coordinates XCoordinate="330" YCoordinate="190"/>
+                            <xpdl:Coordinates XCoordinate="430" YCoordinate="190"/>
+                        </xpdl:ConnectorGraphicsInfo>
+                    </xpdl:ConnectorGraphicsInfos>
+                </xpdl:Transition>
+                <xpdl:Transition From="review" Id="fixate_tra3" To="fixate">
+                    <xpdl:Condition Type="CONDITION">fixate == 'fixate'</xpdl:Condition>
+                    <xpdl:ConnectorGraphicsInfos>
+                        <xpdl:ConnectorGraphicsInfo FillColor="0,0,0" IsVisible="true" Style="NO_ROUTING_SPLINE" ToolId="JaWE"/>
+                    </xpdl:ConnectorGraphicsInfos>
+                </xpdl:Transition>
+                <xpdl:Transition From="review" Id="fixate_tra4" To="reject">
+                    <xpdl:Condition Type="CONDITION">fixate == 'reject'</xpdl:Condition>
+                    <xpdl:ConnectorGraphicsInfos>
+                        <xpdl:ConnectorGraphicsInfo FillColor="0,0,0" IsVisible="true" Style="NO_ROUTING_SPLINE" ToolId="JaWE"/>
+                    </xpdl:ConnectorGraphicsInfos>
+                </xpdl:Transition>
+            </xpdl:Transitions>
+        </xpdl:WorkflowProcess>
+    </xpdl:WorkflowProcesses>
+    <xpdl:ExtendedAttributes>
+        <xpdl:ExtendedAttribute Name="EDITING_TOOL" Value="Together Workflow Editor"/>
+        <xpdl:ExtendedAttribute Name="EDITING_TOOL_VERSION" Value="4.1-1-20111118-0922"/>
+        <xpdl:ExtendedAttribute Name="JaWE_CONFIGURATION" Value="default"/>
+    </xpdl:ExtendedAttributes>
+</xpdl:Package>

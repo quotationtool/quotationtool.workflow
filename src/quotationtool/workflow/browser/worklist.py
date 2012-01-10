@@ -10,6 +10,10 @@ from zope.i18n import translate
 from zope.app.pagetemplate.viewpagetemplatefile import ViewPageTemplateFile
 from z3c.form import field
 from z3c.formui import form
+from z3c.indexer.search import SearchQuery
+from z3c.indexer.query import AnyOf
+
+from quotationtool.user.interfaces import IAccountView
 
 from quotationtool.workflow.interfaces import _
 from quotationtool.workflow import interfaces
@@ -84,6 +88,45 @@ class SimilarWorkItemsValues(value.ValuesMixin):
     def values(self):
         similars = interfaces.ISimilarWorkItems(self.context)
         return similars.getSimilarWorkItems()
+
+
+class AccountWorkListTable(table.Table, BrowserPagelet):
+    """ The bibliography printed like a table."""
+
+    zope.interface.implements(IWorkListTable, IAccountView)
+
+    render = BrowserPagelet.render
+
+    cssClasses = {
+        'table': u'container-listing',
+        'thead': u"head",
+        }
+    cssClassEven = u"even"
+    cssClassOdd = u"odd"
+
+    @property
+    def title(self):
+        return _('account-worklist-title', u"Work Items ($COUNT)",
+                 mapping={'COUNT': unicode(self.getCount())})
+
+    description = _('account-worklist-desc', u"Items saved as 'draft' and other items on your personal to-do list.")
+
+    visible = True
+
+    weight = 10
+
+    def getCount(self):
+        return len(list(self.values))
+
+
+class AccountValues(value.ValuesMixin):
+    """ Values for the account table."""
+
+    @property
+    def values(self):
+        principal_id = self.request.principal.id
+        query = SearchQuery(AnyOf('workitem-contributors', (principal_id,)))
+        return query.searchResults()
 
 
 class ISortingColumn(Interface):

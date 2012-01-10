@@ -59,8 +59,27 @@
       provides="z3c.table.interfaces.IValues"
       factory=".worklist.SimilarWorkItemsValues"
       />
-      
 
+  <z3c:pagelet
+      for="quotationtool.user.interfaces.IAccountController"
+      name="worklist.html"
+      class=".worklist.AccountWorkListTable"
+      permission="quotationtool.ManageMyAccount"
+      layer="quotationtool.skin.interfaces.IQuotationtoolBrowserLayer"
+      />
+  <z3c:template
+      for=".worklist.AccountWorkListTable"
+      template="account.pt"
+      layer="quotationtool.skin.interfaces.IQuotationtoolBrowserLayer"
+      />
+  <adapter
+      for="quotationtool.user.interfaces.IAccountController
+	   *
+	   .worklist.IWorkListTable"
+      provides="z3c.table.interfaces.IValues"
+      factory=".worklist.AccountValues"
+      />
+      
   <adapter
       for="*
            quotationtool.skin.interfaces.IQuotationtoolBrowserLayer

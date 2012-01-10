@@ -1,0 +1,13 @@
+<div i18n:domain="quotationtool">
+
+  <h1 i18n:translate="">Work Items</h1>
+
+  <p i18n:translate="">Your to-do list.</p>
+
+  <div class="batch" tal:content="structure view/renderBatch"/>
+
+  <div tal:replace="structure view/renderTable"/>
+
+  <div class="batch" tal:content="structure view/renderBatch"/>
+
+</div>

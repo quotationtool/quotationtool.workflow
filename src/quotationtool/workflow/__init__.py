@@ -43,3 +43,6 @@ def createWorkFlowContainer(event):
 
     sm['default']['workflow-relevant-oids'] = oids = SetIndex()
     sm.registerUtility(oids, IIndex, name='workflow-relevant-oids')
+
+    sm['default']['workitem-contributor'] = contribs = SetIndex()
+    sm.registerUtility(contribs, IIndex, name='workitem-contributors')

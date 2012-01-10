@@ -23,4 +23,6 @@
   <include package="zope.app.pagetemplate"/>
   <include package="z3c.macro"/>
 
+  <include package="quotationtool.user"/>
+
 </configure>

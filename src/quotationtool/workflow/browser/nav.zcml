@@ -16,7 +16,7 @@
       manager="quotationtool.skin.interfaces.IMainNav"
       viewName="workflow/"
       subMenuProviderName="workflowcontainersubnav"
-      weight="80"
+      weight="200"
       />
   <!-- adaptation: context, request, view, menu, item. See
        z3c.menu.ready2go.checker for more info. -->
