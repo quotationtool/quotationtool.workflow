@@ -23,23 +23,7 @@
       provides="z3c.menu.ready2go.interfaces.ISelectedChecker"
       factory="z3c.menu.ready2go.checker.TrueSelectedChecker"
       />
-  <adapter
-      for="..interfaces.IRemovable
-	   zope.publisher.interfaces.browser.IBrowserRequest
-	   .remove.RemoveRequestForm
-	   z3c.menu.ready2go.interfaces.IMenuManager
-	   .tabs.IWorkflowTab"
-      provides="z3c.menu.ready2go.interfaces.ISelectedChecker"
-      factory="z3c.menu.ready2go.checker.TrueSelectedChecker"
-      />
-  <adapter
-      for="..interfaces.IRemovable
-	   zope.publisher.interfaces.browser.IBrowserRequest
-	   .remove.RemoveProcessStarted
-	   z3c.menu.ready2go.interfaces.IMenuManager
-	   .tabs.IWorkflowTab"
-      provides="z3c.menu.ready2go.interfaces.ISelectedChecker"
-      factory="z3c.menu.ready2go.checker.TrueSelectedChecker"
-      />
+  <!-- other TrueSelectedCheckers for special work items definded in
+       remove.zcml etc. -->
 
 </configure>

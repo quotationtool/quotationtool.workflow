@@ -1,0 +1,4 @@
+<span class="fixed" i18n:domain="quotationtool">
+  <abbr title="Fixed -- protected against removal"
+	i18n:attributes="title fixed-flag">F</abbr>
+</span>

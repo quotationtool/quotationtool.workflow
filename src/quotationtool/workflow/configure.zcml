@@ -131,6 +131,38 @@
 	interface=".interfaces.ISimilarWorkItems"/>
   </class>
 
+  <!-- components for quotationtool.remove workflow definition -->
+
+  <wfmc:xpdl
+      file="fixate.xpdl"
+      process="fixate"
+      id="quotationtool.fixate"
+      integration="zope.wfmc.adapter.integration"
+      />
+
+  <adapter
+      name="quotationtool.fixate.fixate"
+      provides="zope.wfmc.interfaces.IWorkItem"
+      factory=".fixate.FixateWorkItem"
+      />
+
+  <class class=".fixate.FixateWorkItem">
+    <implements
+	interface="zope.annotation.interfaces.IAttributeAnnotatable"/>
+    <allow
+	interface="zope.wfmc.interfaces.IWorkItem"/>
+    <allow
+	interface=".interfaces.IStandardParameters"/>
+    <allow
+	interface=".interfaces.IObjectParameter"/>
+    <require
+	attributes="finish"
+	permission="quotationtool.workflow.DoEditorialReview"
+	/>
+    <allow
+	interface=".interfaces.ISimilarWorkItems"/>
+  </class>
+
   <!-- components for quotationtool.message workflow definition -->
 
   <wfmc:xpdl

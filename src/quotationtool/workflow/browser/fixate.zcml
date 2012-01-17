@@ -5,53 +5,62 @@
     >
 
   <browser:viewlet
-      name="remove-itemaction"
+      name="fixate-itemaction"
       for="..interfaces.IRemovable"
-      class=".remove.RemoveItemAction"
+      class=".fixate.FixateItemAction"
       permission="quotationtool.workflow.Contribute"
       manager="quotationtool.skin.interfaces.IItemActions"
       layer="quotationtool.skin.interfaces.IQuotationtoolBrowserLayer"
-      weight="250"
+      weight="255"
+      />
+  <browser:viewlet
+      name="fixed-flag"
+      for="..interfaces.IRemovable"
+      class=".fixate.FixedFlag"
+      permission="quotationtool.workflow.ReadHistory"
+      manager="quotationtool.skin.interfaces.IFlags"
+      layer="quotationtool.skin.interfaces.IQuotationtoolBrowserLayer"
+      weight="12"
       />
       
   <z3c:pagelet
       for="..interfaces.IRemovable"
-      name="remove.html"
-      class=".remove.RemoveRequestForm"
+      name="fixate.html"
+      class=".fixate.FixateRequestForm"
       permission="quotationtool.workflow.Contribute"
       layer="quotationtool.skin.interfaces.IQuotationtoolBrowserLayer"
       />
 
   <z3c:pagelet
       for="..interfaces.IRemovable"
-      name="removeProcessStarted.html"
-      class=".remove.RemoveProcessStarted"
+      name="fixateProcessStarted.html"
+      class=".fixate.FixateProcessStarted"
       permission="quotationtool.workflow.Contribute"
       layer="quotationtool.skin.interfaces.IQuotationtoolBrowserLayer"
       />
   <z3c:template
-      for=".remove.RemoveProcessStarted"
-      template="remove_process_started.pt"
+      for=".fixate.FixateProcessStarted"
+      template="fixate_process_started.pt"
       layer="quotationtool.skin.interfaces.IQuotationtoolBrowserLayer"
       />
 
   <z3c:pagelet
-      for="..remove.RemoveWorkItem"
+      for="..fixate.FixateWorkItem"
       name="index.html"
-      class=".remove.RemoveEditorialReview"
+      class=".fixate.FixateEditorialReview"
       permission="quotationtool.workflow.DoEditorialReview"
       layer="quotationtool.skin.interfaces.IQuotationtoolBrowserLayer"
       />
   <z3c:template
-      for=".remove.RemoveEditorialReview"
-      template="remove.pt"
+      for=".fixate.FixateEditorialReview"
+      template="fixate.pt"
       layer="quotationtool.skin.interfaces.IQuotationtoolBrowserLayer"
       />
 
   <adapter
       for="..interfaces.IRemovable
 	   zope.publisher.interfaces.browser.IBrowserRequest
-	   .remove.RemoveRequestForm
+	   .fixate.FixateRequestForm
 	   z3c.menu.ready2go.interfaces.IMenuManager
 	   .tabs.IWorkflowTab"
       provides="z3c.menu.ready2go.interfaces.ISelectedChecker"
@@ -60,7 +69,7 @@
   <adapter
       for="..interfaces.IRemovable
 	   zope.publisher.interfaces.browser.IBrowserRequest
-	   .remove.RemoveProcessStarted
+	   .fixate.FixateProcessStarted
 	   z3c.menu.ready2go.interfaces.IMenuManager
 	   .tabs.IWorkflowTab"
       provides="z3c.menu.ready2go.interfaces.ISelectedChecker"

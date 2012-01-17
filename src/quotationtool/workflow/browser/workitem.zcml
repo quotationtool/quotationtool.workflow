@@ -4,6 +4,14 @@
     xmlns:z3c="http://namespaces.zope.org/z3c"
     >
 
+  <view
+      for="zope.wfmc.interfaces.IWorkItem"
+      name="label"
+      factory=".workitem.WorkItemLabel"
+      type="quotationtool.skin.interfaces.IQuotationtoolBrowserLayer"
+      permission="zope.View"
+      />
+
   <z3c:macro
       name="workitem-info"
       template="macros.pt"

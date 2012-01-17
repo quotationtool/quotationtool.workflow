@@ -7,6 +7,7 @@
   <include file="workitem.zcml"/>
   <include file="history.zcml"/>
   <include file="remove.zcml"/>
+  <include file="fixate.zcml"/>
   <include file="message.zcml"/>
   <include file="nav.zcml"/>
   <include file="tabs.zcml"/>

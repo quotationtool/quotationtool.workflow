@@ -1,0 +1,14 @@
+<metal:macro use-macro="macro:form" i18n:domain="quotationtool">
+  
+  <div metal:fill-slot="extra-info" class="fixate-work-item">
+    <div metal:use-macro="macro:workitem-info"/>
+    <div metal:use-macro="macro:workitem-object"/>
+    <div metal:use-macro="macro:workitem-history"/>
+    <div metal:use-macro="macro:workitem-message"/>
+  </div>
+
+  <metal:slot fill-slot="main">
+    <metal:macro use-macro="macro:widget-rows"/>
+  </metal:slot>
+ 
+</metal:macro>

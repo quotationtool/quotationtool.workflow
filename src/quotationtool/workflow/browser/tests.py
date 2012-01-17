@@ -258,6 +258,145 @@ class RemoveTests(PlacelessSetup, unittest.TestCase):
         self.assertTrue(isinstance(view(), unicode))
 
 
+def startFixate(contributor, obj, message=u"Protect it."):
+    """ Helper that starts fixate workflow process."""
+    from quotationtool.workflow.interfaces import IWorkflowHistory
+    history = IWorkflowHistory(obj)
+    import datetime
+    from zope.wfmc.interfaces import IProcessDefinition
+    pd = zope.component.getUtility(IProcessDefinition, 'quotationtool.fixate')
+    proc = pd()
+    proc.start(contributor, datetime.datetime.now(), message, history, obj)
+
+
+class FixateTests(PlacelessSetup, unittest.TestCase):
+
+    def setUp(self):
+        super(FixateTests, self).setUp()
+        setUpZCML(self)
+        setUpIntIds(self)
+        setUpRelationCatalog(self)
+        self.root = rootFolder()
+        setUpWorkLists(self.root)
+        setUpIndexes(self)
+        generateContent(self.root)
+        from quotationtool.workflow.interfaces import IWorkList
+        self.worklist = zope.component.getUtility(IWorkList, name='editor', context=self.root)
+
+    def tearDown(self):
+        tearDown(self)
+
+    def test_FixateProcessStarted(self):
+        from quotationtool.workflow.browser import fixate
+        pagelet = fixate.FixateProcessStarted(self.root['foo2'], TestRequest())
+        self.assertTrue(isinstance(pagelet.render(), unicode))
+
+    def test_FixateRequestForm(self):
+        from quotationtool.workflow.browser import fixate
+        pagelet = fixate.FixateRequestForm(self.root['foo2'], TestRequest())
+        pagelet.update()
+        self.assertTrue(isinstance(pagelet.render(), unicode))
+
+        request = TestRequest(form={
+                'form.widgets.workflow-message': u"Please fixate it.",
+                'form.buttons.fixate': u"Fixate/Unfixate",
+                })
+        pagelet = fixate.FixateRequestForm(self.root['foo2'], request)
+        pagelet.update()
+        self.assertTrue(len(self.worklist) == 1)
+
+    def test_FixateEditorialReview(self):
+        from quotationtool.workflow.browser import fixate
+        startFixate(TestRequest().principal.id, self.root['foo2'])
+        item = self.worklist.pop()
+        pagelet = fixate.FixateEditorialReview(item, TestRequest())
+        pagelet.update()
+        self.assertTrue(isinstance(pagelet.render(), unicode))
+
+    def test_Reject(self):
+        from quotationtool.workflow.browser import fixate
+        from quotationtool.workflow.interfaces import IFixed
+        startFixate(TestRequest().principal.id, self.root['foo2'])
+        item = self.worklist.pop()
+        request = TestRequest(form={
+                'form.widgets.workflow-message': u"?",
+                'form.buttons.reject': u"reject",
+                })
+        pagelet = fixate.FixateEditorialReview(item, request)
+        pagelet.update()
+        self.assertTrue(len(self.worklist) == 0)
+        self.assertTrue(not IFixed.providedBy(self.root['foo2']))
+
+    def test_Postpone(self):
+        from quotationtool.workflow.browser import fixate
+        from quotationtool.workflow.interfaces import IFixed
+        startFixate(TestRequest().principal.id, self.root['foo2'])
+        item = self.worklist.pop()
+        request = TestRequest(form={
+                'form.widgets.workflow-message': u"?",
+                'form.buttons.postpone': u"Postpone",
+                })
+        pagelet = fixate.FixateEditorialReview(item, request)
+        pagelet.update()
+        self.assertTrue(len(self.worklist) == 1)
+        self.assertTrue(not IFixed.providedBy(self.root['foo2']))
+
+    def test_Fixate(self):
+        from quotationtool.workflow.browser import fixate
+        from quotationtool.workflow.interfaces import IFixed
+        startFixate(TestRequest().principal.id, self.root['foo2'])
+        item = self.worklist.pop()
+        request = TestRequest(form={
+                'form.widgets.workflow-message': u"Yes!",
+                'form.buttons.fixate': u"Fixate",
+                })
+        pagelet = fixate.FixateEditorialReview(item, request)
+        pagelet.update()
+        self.assertTrue(len(self.worklist) == 0)
+        self.assertTrue(IFixed.providedBy(self.root['foo2']))
+
+    def test_Unfixate(self):
+        from quotationtool.workflow.browser import fixate
+        from quotationtool.workflow.interfaces import IFixed
+        startFixate(TestRequest().principal.id, self.root['foo2'])
+        zope.interface.directlyProvides(self.root['foo2'], IFixed)
+        item = self.worklist.pop()
+        request = TestRequest(form={
+                'form.widgets.workflow-message': u"Yes!",
+                'form.buttons.unfixate': u"Unfixate",
+                })
+        pagelet = fixate.FixateEditorialReview(item, request)
+        pagelet.update()
+        self.assertTrue(len(self.worklist) == 0)
+        self.assertTrue(not IFixed.providedBy(self.root['foo2']))
+
+    def test_ItemInWorkList(self):
+        from quotationtool.workflow.browser import worklist
+        startFixate(TestRequest().principal.id, self.root['foo2'])
+        pagelet = worklist.WorkListTable(self.worklist, TestRequest())
+        pagelet.update()
+        self.assertTrue(isinstance(pagelet.render(), unicode))
+        
+    def test_ItemInSimilarWorkItemsTable(self):
+        from quotationtool.workflow.browser import worklist
+        startFixate(TestRequest().principal.id, self.root['foo2'])
+        startFixate(TestRequest().principal.id, self.root['foo2'])
+        item = self.worklist.pop()
+        view = worklist.SimilarWorkItemsTable(item, TestRequest())
+        self.assertTrue(isinstance(view(), unicode))
+
+    def test_FixedFlag(self):
+        from quotationtool.workflow.browser import fixate
+        from quotationtool.workflow.interfaces import IFixed
+        viewlet = fixate.FixedFlag(TestRequest(), self.root['foo2'], None, None)
+        viewlet.update()
+        self.assertTrue('fix' not in viewlet.render())
+        zope.interface.directlyProvides(self.root['foo2'], IFixed)
+        viewlet = fixate.FixedFlag(TestRequest(), self.root['foo2'], None, None)
+        viewlet.update()
+        #self.assertTrue(u'fix' in viewlet.render()) # TODO
+
+
 def startMessage(contributor, msg, obj):
     """ Helper that starts message workflow process."""
     from quotationtool.workflow.interfaces import IWorkflowHistory
@@ -299,7 +438,7 @@ class MessageTests(PlacelessSetup, unittest.TestCase):
 
         request = TestRequest(form={
                 'form.widgets.workflow-message': u"There's a typo.",
-                'form.buttons.send': u"Send",
+                'form.buttons.submit': u"Submit",
                 })
         pagelet = message.MessageRequestForm(self.root['foo2'], request)
         pagelet.update()
@@ -433,15 +572,41 @@ class WorkflowHistoryTests(PlacelessSetup, unittest.TestCase):
         self.assertTrue(isinstance(pagelet.render(), unicode))
 
 
+class WorkItemTests(PlacelessSetup, unittest.TestCase):
+    """ Tests for components common to all/different workitems"""
+
+    def setUp(self):
+        super(WorkItemTests, self).setUp()
+        setUpZCML(self)
+        setUpIntIds(self)
+        setUpRelationCatalog(self)
+        self.root = rootFolder()
+        setUpWorkLists(self.root)
+        setUpIndexes(self)
+        generateContent(self.root)
+        from quotationtool.workflow.interfaces import IWorkList
+        self.worklist = zope.component.getUtility(IWorkList, name='editor', context=self.root)
+
+    def tearDown(self):
+        tearDown(self)
+
+    def test_Label(self):
+        startRemove(TestRequest().principal.id, self.root['foo2'])
+        item = self.worklist.pop()
+        view = zope.component.queryMultiAdapter((item, TestRequest()), name='label')
+        self.assertTrue(isinstance(view(), unicode))
+
+
 def test_suite():
     return unittest.TestSuite((
             unittest.makeSuite(RemoveTests),
+            unittest.makeSuite(FixateTests),
             unittest.makeSuite(MessageTests),
             unittest.makeSuite(ListWorkListsTests),
             unittest.makeSuite(WorkListTests),
             unittest.makeSuite(WorkflowHistoryTests),
+            unittest.makeSuite(WorkItemTests),
             ))
 
 if __name__ == "__main__":
     unittest.main(defaultTest='test_suite')
-

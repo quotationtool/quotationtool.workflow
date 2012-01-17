@@ -21,34 +21,34 @@ from quotationtool.workflow.history import UserNotation
 from quotationtool.workflow.browser import common
 
 message = zope.schema.Text(
-    title=_('message-message-title',
+    title=_('fixate-message-title',
             u"Message"),
-    description=_('message-message-desc',
+    description=_('fixate-message-desc',
                   u"Please enter the message you want to send to the editorial staff."),
     required=True,
     )
 message.__name__ = 'workflow-message'
 
 answer = zope.schema.Text(
-    title=_('message-answer-title',
-            u"Answer"),
-    description=_('message-answer-desc',
-                  u"Please give a (short) answer to the message."),
-    required=True,
+    title=_('fixate-comment-title',
+            u"Comment"),
+    description=_('fixate-comment-desc',
+                  u"Please give a (short) comment about the request, especially if you reject it."),
+    required=False,
     )
 answer.__name__ = 'workflow-message'
 
-class MessageRequestForm(form.Form):
+class FixateRequestForm(form.Form):
 
     implements(ITabbedContentLayout)
 
-    label = _('messagerequestform-label',
-              u"Message about database item")
+    label = _('fixaterequestform-label',
+              u"Fixation of Database Item")
 
-    info = _('messagerequestform-info',
-             u"Using the form below you can send a message to the editorial staff. It should be about this database item. May be you found a typo or an other mistake, want changes to be made. The site's editors will read your message and decide what to do. You can read their answer by visiting the tab called 'Workflow' under this database item.")
+    info = _('fixaterequestform-info',
+             u"Using the form below you can ask the editorial staff to protect this database item against removal (or remove a protection). The site's editors will read your message and decide what to do.")
 
-    process_id = 'quotationtool.message'
+    process_id = 'quotationtool.fixate'
 
     @property
     def action(self):
@@ -60,8 +60,8 @@ class MessageRequestForm(form.Form):
     ignoreContext = True
     ignoreReadonly = True
 
-    @button.buttonAndHandler(_(u"Submit"), name='submit')
-    def handleSend(self, action):
+    @button.buttonAndHandler(_(u"Submit"), name='fixate')
+    def handleFixate(self, action):
         data, errors = self.extractData()
         if errors:
             self.status = self.formErrorsMessage
@@ -83,7 +83,7 @@ class MessageRequestForm(form.Form):
                 getattr(principal, 'id', u"Unknown"),
                 data['workflow-message']
                 ))
-        #self.template = ViewPageTemplateFile('message_process_started.pt')
+        #self.template = ViewPageTemplateFile('fixate_process_started.pt')
         self.request.response.redirect(self.nextURL())
 
     @button.buttonAndHandler(_(u"Cancel"), name="cancel")
@@ -92,29 +92,30 @@ class MessageRequestForm(form.Form):
         self.request.response.redirect(url)
 
     def nextURL(self):
-        return absoluteURL(self.context, self.request) + u"/@@messageProcessStarted.html#tabs"
+        return absoluteURL(self.context, self.request) + u"/@@fixateProcessStarted.html#tabs"
 
 
-class MessageProcessStarted(BrowserPagelet):
-    """ Notification that the message process started."""
+class FixateProcessStarted(BrowserPagelet):
+    """ Notification that the fixate process started."""
 
     implements(ITabbedContentLayout)
 
 
-class MessageEditorialReview(form.Form):
+class FixateEditorialReview(form.Form):
+    """ Form for the the work item."""
     
     implements(interfaces.IWorkItemForm)
 
     fields = field.Fields(answer)
 
-    label = _('messageeditorialreview-label', u"Editorial Review of Message")
+    label = _('fixateeditorialreview-label', u"Editorial Review of Fixation Request")
 
-    info = _('messageeditorialreview-info', u"Please write an answer to the user's message about the item.")
+    info = _('fixateeditorialreview-info', u"Please decide to fixate/unfixate the database item.")
 
     ignoreContext = True
     ignoreReadonly = True
 
-    def _handle(self, answr):
+    def _handle(self, fixate):
         data, errors = self.extractData()
         if errors:
             self.status = self.formErrorsMessage
@@ -126,12 +127,20 @@ class MessageEditorialReview(form.Form):
                 data['workflow-message']))
         #get next URL before removing work item
         url = self.nextURL()
-        self.context.finish(answr, data['workflow-message'])
+        self.context.finish(fixate, data['workflow-message'])
         self.request.response.redirect(url)
 
-    @button.buttonAndHandler(_(u"Answer"), name="answer")
-    def handleAnswer(self, action):
-        self._handle('answer')
+    @button.buttonAndHandler(_(u"Fixate"), name="fixate")
+    def handleFixate(self, action):
+        self._handle('fixate')
+        
+    @button.buttonAndHandler(_(u"Unfixate"), name="unfixate")
+    def handleUnfixate(self, action):
+        self._handle('unfixate')
+        
+    @button.buttonAndHandler(_(u"Reject"), name="reject")
+    def handleReject(self, action):
+        self._handle('reject')
         
     @button.buttonAndHandler(_(u"Postpone"), name="postpone")
     def handlePostpone(self, action):
@@ -151,9 +160,19 @@ class MessageEditorialReview(form.Form):
         return escape(self.context.message).replace('\n', '<br />')
 
 
-class MessageItemAction(ViewletBase):
+class FixateItemAction(ViewletBase):
     
-    template = ViewletPageTemplateFile('message_action.pt')
+    template = ViewletPageTemplateFile('fixate_action.pt')
 
     def render(self):
         return self.template()
+
+
+class FixedFlag(ViewletBase):
+    
+    template = ViewletPageTemplateFile('fixed.pt')
+
+    def render(self):
+        if interfaces.IFixed.providedBy(self.context):
+            return self.template()
+        return u""

@@ -1,0 +1,4 @@
+<span 
+    tal:content="context/__parent__/zope:title|default"
+    ><tal:block content="context/__parent__/__name__|default">Work Item</tal:block
+    ></span>

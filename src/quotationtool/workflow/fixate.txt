@@ -1,0 +1,203 @@
+Fixation
+========
+
+We might want to protect database items against removal etc. This is
+achieved by slamming the interface IFixed on that item. That is done
+in a workflow process called 'quotationtool.fixate'. Users can ask for
+faxation of the item--they actually start a quotationtool.fixate workflow
+process on the item. Then the fixation is controled by the site
+editors who can decide what to do.
+
+Unfixation, i.e. removing the IFixed interface from the item, is also
+controled by this workflow.
+
+So let's have a look how things work. First we need to set up the
+worklist for editorial review.
+
+>>> from quotationtool.workflow.worklist import WorkList
+>>> from quotationtool.workflow.interfaces import IWorkList
+>>> import zope.component
+>>> editor_items = WorkList()
+>>> zope.component.provideUtility(editor_items, IWorkList, name='editor')
+
+Register simple subscriber to make workflow events visible.
+
+>>> def log_workflow(event):
+...     print(event)
+
+>>> import zope.event
+>>> zope.event.subscribers.append(log_workflow)
+
+Get workflow definition.
+
+>>> from zope.wfmc.interfaces import IProcessDefinition
+>>> import zope.component
+>>> pd = zope.component.getUtility(IProcessDefinition,
+...                                'quotationtool.fixate')
+
+>>> pd
+ProcessDefinition('quotationtool.fixate')
+
+>>> pd.id
+'quotationtool.fixate'
+
+Create some dummy item
+
+>>> class Foo(object):
+...     pass
+>>> foo = Foo()
+
+The item must implement IRemovable, otherwise the workflow will end
+with an exception. This makes sense, because fixation protects against
+removal. Normally this would be done in zcml.
+
+>>> from zope.interface import classImplements
+>>> from quotationtool.workflow.interfaces import IRemovable
+>>> classImplements(Foo, IRemovable)
+
+In the beginning IFixed is not provided.
+
+>>> from quotationtool.workflow.interfaces import IFixed
+>>> IFixed.providedBy(foo)
+False
+
+>>> proc = pd()
+>>> import datetime
+
+The start method takes formal parameters:
+1) The user-id of the user who asks the object to be fixed.
+2) The time of the process is started.
+3) A message why the item should be fixed.
+4) The workflow history. 
+5) The object which is asked to be fixed.
+
+>>> proc.start('chris', datetime.datetime.now(), u"Hi.", None, foo)
+ProcessStarted(Process('quotationtool.fixate'))
+Transition(None, Activity('quotationtool.fixate.start'))
+ActivityStarted(Activity('quotationtool.fixate.start'))
+ActivityFinished(Activity('quotationtool.fixate.start'))
+Transition(Activity('quotationtool.fixate.start'), Activity('quotationtool.fixate.review'))
+ActivityStarted(Activity('quotationtool.fixate.review'))
+...
+
+>>> item = editor_items.pop()
+>>> item
+<quotationtool.workflow.fixate.FixateWorkItem object at 0x...>
+
+>>> item.finish('postpone', u"")
+<...
+WorkItemFinished(u'fixate')
+ActivityFinished(Activity('quotationtool.fixate.review'))
+Transition(Activity('quotationtool.fixate.review'), Activity('quotationtool.fixate.review'))
+ActivityStarted(Activity('quotationtool.fixate.review'))
+...
+
+
+>>> item = editor_items.pop()
+>>> item.finish('fixate', u"Yes!")
+<...
+WorkItemFinished(u'fixate')
+ActivityFinished(Activity('quotationtool.fixate.review'))
+Transition(Activity('quotationtool.fixate.review'), Activity('quotationtool.fixate.fixate'))
+ActivityStarted(Activity('quotationtool.fixate.fixate'))
+ActivityFinished(Activity('quotationtool.fixate.fixate'))
+ProcessFinished(Process('quotationtool.fixate'))
+
+
+>>> IFixed.providedBy(foo)
+True
+
+>>> from zope.interface import directlyProvidedBy
+>>> IFixed in directlyProvidedBy(foo)
+True
+
+Remove simple logger from subscriber list. 
+
+>>> zope.event.subscribers.remove(log_workflow)
+
+
+Already fixed
++++++++++++++
+
+If the item is already fixed, trying to fix will raise an exception.
+
+>>> from zope.interface import directlyProvides
+>>> foo = Foo()
+>>> directlyProvides(foo, IFixed)
+>>> proc = pd()
+>>> proc.start('bob', datetime.datetime.now(), u"Again!", None, foo)
+>>> item = editor_items.pop()
+>>> item.finish('fixate', u"Again")
+Traceback (most recent call last):
+...
+ProcessError: fixate-ifixed-already-provided
+
+>>> item.finish('reject', u"")
+
+
+Unfixate
+++++++++
+
+We can also remove the IFixed interface from the database item.
+
+>>> proc = pd()
+>>> proc.start('bob', datetime.datetime.now(), u"", None, foo)
+>>> item = editor_items.pop()
+>>> item.finish('unfixate', u"")
+>>> IFixed.providedBy(foo)
+False
+
+
+Unfixate if not fixed
++++++++++++++++++++++
+
+>>> proc = pd()
+>>> proc.start('bob', datetime.datetime.now(), u"Please remove fixation.", None, foo)
+>>> item = editor_items.pop()
+>>> item.finish('unfixate', u"")
+Traceback (most recent call last):
+...
+ProcessError: unfix-failed-not-fixed
+
+>>> item.finish('reject', u"")
+
+
+Similar items
+~~~~~~~~~~~~~
+
+There is an index watching which workflow items have (are about) which
+database items. 
+
+This is done by integer IDs. There is an intids utility set up in test
+setup and also an index.
+
+    >>> import zope.component
+    >>> from zope.intid.interfaces import IIntIds
+    >>> intids = zope.component.getUtility(IIntIds)
+    >>> oid = intids.register(foo)
+    
+
+    >>> from z3c.indexer import query, search
+    >>> qry = search.SearchQuery(query.AnyOf('workflow-relevant-oids', (oid,)))
+    >>> result = qry.apply()
+    >>> len(list(result))
+    0
+
+    >>> proc = pd()
+    >>> proc.start('chris', None, None, None, foo)
+ 
+    >>> qry = search.SearchQuery(query.AnyOf('workflow-relevant-oids', (oid,)))
+    >>> result = qry.apply()
+    >>> len(list(result))
+    1
+
+    >>> item = editor_items.pop()
+    >>> item_id = intids.getId(item)
+    >>> list(result) == [item_id]
+    True
+
+    >>> item.finish('reject', u"Done")
+    >>> qry = search.SearchQuery(query.AnyOf('workflow-relevant-oids', (oid,)))
+    >>> result = qry.apply()
+    >>> len(list(result))
+    0

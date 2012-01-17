@@ -108,7 +108,7 @@
                                 <xpdl:BasicType Type="STRING"/>
                             </xpdl:DataType>
                         </xpdl:FormalParameter>
-                        <xpdl:FormalParameter Id="message" IsArray="false" Mode="IN" Name="Message">
+                        <xpdl:FormalParameter Id="message" IsArray="false" Mode="INOUT" Name="Message">
                             <xpdl:DataType>
                                 <xpdl:BasicType Type="STRING"/>
                             </xpdl:DataType>
@@ -219,7 +219,7 @@
                     </xpdl:ConnectorGraphicsInfos>
                 </xpdl:Transition>
                 <xpdl:Transition From="review" Id="fixate_tra3" To="fixate">
-                    <xpdl:Condition Type="CONDITION">fixate == 'fixate'</xpdl:Condition>
+                    <xpdl:Condition Type="CONDITION">fixate == 'fixate' or fixate == 'unfixate'</xpdl:Condition>
                     <xpdl:ConnectorGraphicsInfos>
                         <xpdl:ConnectorGraphicsInfo FillColor="0,0,0" IsVisible="true" Style="NO_ROUTING_SPLINE" ToolId="JaWE"/>
                     </xpdl:ConnectorGraphicsInfos>

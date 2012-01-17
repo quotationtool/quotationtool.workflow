@@ -4,14 +4,6 @@
     xmlns:browser="http://namespaces.zope.org/browser"
     >
 
-  <view
-      for="..message.MessageWorkItem"
-      name="label"
-      type="quotationtool.skin.interfaces.IQuotationtoolBrowserLayer"
-      factory=".message.MessageWorkItemLabel"
-      permission="zope.View"
-      />
-
   <browser:viewlet
       name="message-itemaction"
       for="..interfaces.ISubjectOfMessage"
@@ -19,7 +11,7 @@
       permission="quotationtool.workflow.Contribute"
       manager="quotationtool.skin.interfaces.IItemActions"
       layer="quotationtool.skin.interfaces.IQuotationtoolBrowserLayer"
-      weight="250"
+      weight="260"
       />
       
   <z3c:pagelet
@@ -54,6 +46,25 @@
       for=".message.MessageEditorialReview"
       template="message.pt"
       layer="quotationtool.skin.interfaces.IQuotationtoolBrowserLayer"
+      />
+
+  <adapter
+      for="..interfaces.ISubjectOfMessage
+	   zope.publisher.interfaces.browser.IBrowserRequest
+	   .message.MessageRequestForm
+	   z3c.menu.ready2go.interfaces.IMenuManager
+	   .tabs.IWorkflowTab"
+      provides="z3c.menu.ready2go.interfaces.ISelectedChecker"
+      factory="z3c.menu.ready2go.checker.TrueSelectedChecker"
+      />
+  <adapter
+      for="..interfaces.ISubjectOfMessage
+	   zope.publisher.interfaces.browser.IBrowserRequest
+	   .message.MessageProcessStarted
+	   z3c.menu.ready2go.interfaces.IMenuManager
+	   .tabs.IWorkflowTab"
+      provides="z3c.menu.ready2go.interfaces.ISelectedChecker"
+      factory="z3c.menu.ready2go.checker.TrueSelectedChecker"
       />
 
 </configure>

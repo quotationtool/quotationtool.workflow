@@ -61,7 +61,7 @@ class RemoveRequestForm(form.Form):
     ignoreContext = True
     ignoreReadonly = True
 
-    @button.buttonAndHandler(_(u"Remove"), name='remove')
+    @button.buttonAndHandler(_(u"Submit"), name='remove')
     def handleRemove(self, action):
         data, errors = self.extractData()
         if errors:
@@ -101,13 +101,6 @@ class RemoveProcessStarted(BrowserPagelet):
 
     implements(ITabbedContentLayout)
 
-
-class RemoveWorkItemLabel(BrowserView):
-    """ Label for work item."""
-
-    def __call__(self):
-        return _('remove-workitem-label',
-                 u"Editorial Review")
 
 class RemoveEditorialReview(form.Form):
     

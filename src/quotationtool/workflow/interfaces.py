@@ -198,3 +198,14 @@ class IMessageSchema(zope.interface.Interface):
         required=True,
         default='answer',
         )
+
+
+class IFixateSchema(zope.interface.Interface):
+    
+    fixate = zope.schema.Choice(
+        title=u"Fixate",
+        description=u"Input data passed to the finish method of the application.",
+        values=('fixate', 'unfixate', 'reject', 'postpone'),
+        required=True,
+        default='fixate',
+        )
