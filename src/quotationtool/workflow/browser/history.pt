@@ -1,24 +1,45 @@
-<div i18n:domain="quotationtool">
-  
+<div class="workflow" i18n:domain="quotationtool">
+
   <h1 i18n:translate="">Workflow</h1>
 
-  <p i18n:translate="workflow-history-description">
-    Adding, changing, removing items to the database is controled by
-    workflow processes, that let the site's editors decide whether an
-    item, some user contributes, will be published or not, whether it
-    needs changes, whether it will be removed etc. Contributions,
-    requests for change or removal and the decisions of the editors
-    make the item's workflow history.
-  </p>
+  <div class="meta"
+      tal:define="created context/zope:created;
+		  modified context/zope:modified;
+		  formatter python:request.locale.dates.getFormatter('dateTime')">
+    <!--h2 i18n:translate="">Metadata</h2-->
+    <p i18n:translate="">
+      This item was contributed by <span i18n:name="contributor"
+      tal:content="context/quotationtool:creator|default">AN UNKOWN
+      USER</span>, <span i18n:name="date"
+      tal:content="python:formatter.format(created)">an unkown
+      date</span>.
+    </p>
+    <p i18n:translate="">
+      It was last modified by <span i18n:name="contributor"
+      tal:content="context/quotationtool:editor|default">AN UNKOWN
+      USER</span>, <span
+      tal:content="python:formatter.format(modified)">an unkown
+      date</span>.
+    </p>
+  </div>
 
-  <tal:block condition="view/notations">
-  <h2 i18n:translate="">Workflow History (reversed order)</h2>
-  <div class="workflow-history">
-    <div tal:repeat="notation view/notations" 
-	 tal:content="structure notation/@@details">
+  <div class="history" tal:condition="view/notations">
+    <h2 i18n:translate="">Workflow History (reversed order)</h2>
+    <p class="description" 
+       i18n:translate="workflow-history-description">
+      Adding, changing, removing items to the database is controled by
+      workflow processes, that let the site's editors decide whether
+      an item, some user contributes, will be published or not,
+      whether it needs changes, whether it will be removed
+      etc. Contributions, requests for change or removal and the
+      decisions of the editors make the item's workflow history.
+    </p>
+    <div class="notations">
+      <div tal:repeat="notation view/notations">
+	<div tal:content="structure notation/@@details"/>
+      </div>
     </div>
   </div>
-  </tal:block>
 
   <h2 i18n:translate="">Current Work Items</h2>
 

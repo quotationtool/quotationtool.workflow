@@ -72,6 +72,9 @@
       factory=".workitem.EditorialReviewWorkItem"
       />
 
+  <subscriber
+      handler=".workitem.lastActivitySubscriber"/>
+
   <!-- adapters for work items -->
 
   <adapter
