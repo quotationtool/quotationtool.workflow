@@ -12,6 +12,7 @@
   <include package="zope.security"/>
   <include package="zope.annotation"/>
   <include package="zope.intid"/>
+  <include package="zope.dublincore"/>
   
   <include package="quotationtool.security"/>
   <include package="quotationtool.site"/>

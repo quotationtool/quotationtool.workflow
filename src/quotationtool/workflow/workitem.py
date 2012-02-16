@@ -143,12 +143,9 @@ class OIDsIndexer(ValueIndexer):
                 ids.append(i)
         return ids
 
-    def doIndexOFF(self):
-        raise Exception
 
-
-@zope.component.adapter(IIntIdAddedEvent)
-def indexOIDs(event):
+@zope.component.adapter(interfaces.ISimilarWorkItems, IIntIdAddedEvent)
+def indexOIDs(workitem, event):
     indexer = zope.component.queryAdapter(
         event.object, IIndexer, 
         name='workflow-relevant-oids')
@@ -156,8 +153,8 @@ def indexOIDs(event):
         indexer.doIndex()
 
 
-@zope.component.adapter(IIntIdRemovedEvent)
-def unindexOIDs(event):
+@zope.component.adapter(interfaces.ISimilarWorkItems, IIntIdRemovedEvent)
+def unindexOIDs(workitem, event):
     indexer = zope.component.queryAdapter(
         event.object, IIndexer, 
         name='workflow-relevant-oids')

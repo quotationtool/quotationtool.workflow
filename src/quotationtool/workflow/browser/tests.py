@@ -59,15 +59,18 @@ def getRef(obj, catalog):
 
 def generateContent(container):
     from zope.container.sample import SampleContainer
+    from zope.dublincore.interfaces import IWriteZopeDublinCore
+    import datetime
     #container = SampleContainer()
-    container['foo1'] = foo1 = Foo()
-    container['foo2'] = Foo()
-    container['foo3'] = Foo()
-    container['foo4'] = Foo()
-    container['bar1'] = bar1 = Bar()
-    container['bar2'] = bar2 = Bar()
-    bar1.ref = foo1
-    bar2.ref = foo1
+    for i in range(3):
+        container['foo'+str(i+1)] = foo = Foo()
+        container['bar'+str(i+1)] = bar = Bar()
+        IWriteZopeDublinCore(foo,None).created = datetime.datetime.now()
+        IWriteZopeDublinCore(foo,None).modified = datetime.datetime.now()
+        IWriteZopeDublinCore(bar,None).created = datetime.datetime.now()
+        IWriteZopeDublinCore(bar,None).modified = datetime.datetime.now()
+    container['bar1'].ref = container['foo1']
+    container['bar2'].ref = container['foo1']
     return container
 
 def generateSite(root):
