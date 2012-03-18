@@ -30,3 +30,9 @@ class EditorParticipant(ParticipantBase):
 class TechnicalEditorParticipant(ParticipantBase):
     
     __name__ = 'technicaleditor'
+
+
+class SystemParticipant(ParticipantBase):
+
+    __name__ = 'system'
+

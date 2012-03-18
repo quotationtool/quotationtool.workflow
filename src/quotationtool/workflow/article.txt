@@ -66,6 +66,14 @@ Define a context
 ...         self.decision = decision
 >>> context = PublicationContext()
 
+Define work items:
+
+
+>>> from quotationtool.workflow import workitem
+>>> from zope.wfmc.interfaces import IWorkItem
+>>> zope.component.provideAdapter(workitem.ContributorWorkItem, provides=IWorkItem, name='.edit')
+>>> zope.component.provideAdapter(workitem.EditorialReviewWorkItem, provides=IWorkItem, name='.review')
+
 Start workflow process
 
 >>> proc = pd(context)

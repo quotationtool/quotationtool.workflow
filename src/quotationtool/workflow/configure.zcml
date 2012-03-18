@@ -43,6 +43,7 @@
     
   <subscriber handler=".createWorkFlowContainer"/>
 
+  <!-- participants known in all workflows -->
 
   <adapter
       name=".contributor"
@@ -59,17 +60,10 @@
       provides="zope.wfmc.interfaces.IParticipant"
       factory=".participant.TechnicalEditorParticipant"
       />
-
-  <!-- work items (aka applications) kown in all workflows -->
   <adapter
-      name=".edit"
-      provides="zope.wfmc.interfaces.IWorkItem"
-      factory=".workitem.ContributorWorkItem"
-      />
-  <adapter
-      name=".review"
-      provides="zope.wfmc.interfaces.IWorkItem"
-      factory=".workitem.EditorialReviewWorkItem"
+      name=".system"
+      provides="zope.wfmc.interfaces.IParticipant"
+      factory=".participant.SystemParticipant"
       />
 
   <subscriber
@@ -134,7 +128,7 @@
 	interface=".interfaces.ISimilarWorkItems"/>
   </class>
 
-  <!-- components for quotationtool.remove workflow definition -->
+  <!-- components for quotationtool.fixate workflow definition -->
 
   <wfmc:xpdl
       file="fixate.xpdl"
