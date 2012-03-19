@@ -2,21 +2,18 @@ from zope.interface import implements, directlyProvides, noLongerProvides
 import zope.component
 from zope.wfmc.interfaces import ProcessError
 
-from quotationtool.workflow.workitem import WorkItemBase, SimilarWorkItemsMixin
+from quotationtool.workflow.workitem import WorkItemBase
 from quotationtool.workflow import interfaces
 from quotationtool.workflow.interfaces import _
 
 
-class FixateWorkItem(WorkItemBase, SimilarWorkItemsMixin):
+class FixateWorkItem(WorkItemBase):
     """ Work item (application) for review activity in a
     quotationtool.fixate workflow."""
 
-    implements(interfaces.IStandardParameters,
-               interfaces.IObjectParameter)
+    implements(interfaces.IFixateWorkItem)
 
     contributor = starttime = message = history = object_ = None 
-
-    oid_attributes = ('object_', )
 
     schema = interfaces.IFixateSchema
 

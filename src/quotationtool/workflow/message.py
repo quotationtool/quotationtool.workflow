@@ -1,16 +1,15 @@
 from zope.interface import implements
 import zope.component
 
-from quotationtool.workflow.workitem import WorkItemBase, SimilarWorkItemsMixin
+from quotationtool.workflow.workitem import WorkItemBase
 from quotationtool.workflow import interfaces
 
 
-class MessageWorkItem(WorkItemBase, SimilarWorkItemsMixin):
+class MessageWorkItem(WorkItemBase):
     """ Work item (application) for review activity in a
     quotationtool.message workflow."""
 
-    implements(interfaces.IStandardParameters,
-               interfaces.IObjectParameter)
+    implements(interfaces.IMessageWorkItem)
 
     contributor = starttime = message = history = object_ = None 
 

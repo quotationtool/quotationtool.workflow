@@ -12,13 +12,14 @@
          tal:content="structure view/info|nothing">info</span>
     </div>
 
-    <div metal:define-macro="similar-work-items" 
-	tal:condition="python:len(list(context.getSimilarWorkItems()))>0" 
+    <div metal:define-macro="similar-work-items"
+	tal:define="items python:list(modules['quotationtool'].workflow.interfaces.ISimilarWorkItems(context).getSimilarWorkItems())"
+	tal:condition="python:len(items)>0" 
 	class="similar-work-items">
       <p i18n:translate="">
 	<b>Attention:</b> The database item is relevant for <span
 	i18n:name="COUNT"
-	tal:content="python:len(list(context.getSimilarWorkItems()))"
+	tal:content="python:len(items)"
 	>5</span> other workflow processes, too. You will not be able
 	to remove it before these other processes are finished.
       </p>

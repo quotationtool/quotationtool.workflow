@@ -1,10 +1,10 @@
-Article Demo
-============
+Workflow Demo
+=============
 
-Demo with workflow defined in article.xpdl
+Demo with workflow defined in demo.xpdl.
 
 >>> import os
->>> file_name = os.path.join(this_directory, 'article.xpdl')
+>>> file_name = os.path.join(this_directory, 'demo.xpdl')
 >>> zcml("""
 ...     <configure
 ...         xmlns="http://namespaces.zope.org/zope"
@@ -22,7 +22,24 @@ Demo with workflow defined in article.xpdl
 ...     </configure>
 ... """ % locals())
 
+Get workflow definition.
 
+>>> from zope.wfmc.interfaces import IProcessDefinition
+>>> import zope.component
+>>> pd = zope.component.getUtility(IProcessDefinition,
+...                                'quotationtool.article')
+
+>>> pd
+ProcessDefinition('quotationtool.article')
+
+>>> import zope.wfmc.adapter
+>>> pd.integration is zope.wfmc.adapter.integration
+True
+
+
+
+Worklists
++++++++++
 
 We need to set up some worklists.
 
@@ -42,19 +59,6 @@ Register simple subscriber to make workflow events visible.
 >>> import zope.event
 >>> zope.event.subscribers.append(log_workflow)
 
-Get workflow definition.
-
->>> from zope.wfmc.interfaces import IProcessDefinition
->>> import zope.component
->>> pd = zope.component.getUtility(IProcessDefinition,
-...                                'quotationtool.article')
-
->>> pd
-ProcessDefinition('quotationtool.article')
-
->>> import zope.wfmc.adapter
->>> pd.integration is zope.wfmc.adapter.integration
-True
 
 Define a context
 
@@ -66,15 +70,36 @@ Define a context
 ...         self.decision = decision
 >>> context = PublicationContext()
 
-Define work items:
 
+Define work items. We derive them from WorkItemBase which provides
+methods to append to and remove from the worklists.
 
 >>> from quotationtool.workflow import workitem
 >>> from zope.wfmc.interfaces import IWorkItem
->>> zope.component.provideAdapter(workitem.ContributorWorkItem, provides=IWorkItem, name='.edit')
->>> zope.component.provideAdapter(workitem.EditorialReviewWorkItem, provides=IWorkItem, name='.review')
+>>> class ContributorWorkItem(workitem.WorkItemBase):
+...     def start(self):
+...         self._appendToWorkList()
+...     def finish(self, save):
+...         self._removeFromWorkList()
+...         self.participant.activity.workItemFinished(self, save)
+... 
+>>> class EditorialReviewWorkItem(workitem.WorkItemBase):
+...     def start(self):
+...         self._appendToWorkList()
+...     def finish(self, publish):
+...         # we remove the work item on publish=='postpone', too. It gets
+...         # added by start again.
+...         self._removeFromWorkList()
+...         self.participant.activity.workItemFinished(self, publish)
+... 
 
-Start workflow process
+We have to register these items as adapters. (Note that one also would
+want to define some permissions in zcml using the class-directive.)
+
+>>> zope.component.provideAdapter(ContributorWorkItem, provides=IWorkItem, name='.edit')
+>>> zope.component.provideAdapter(EditorialReviewWorkItem, provides=IWorkItem, name='.review')
+
+Now we can start the workflow process.
 
 >>> proc = pd(context)
 
@@ -106,15 +131,10 @@ True
 
 >>> item = contributor_items.pop()
 >>> item
-<quotationtool.workflow.workitem.ContributorWorkItem object at 0x...>
+<ContributorWorkItem object at 0x...>
 
 >>> item.participant.__name__
 'contributor'
-
->>> item.finish('hi')
-Traceback (most recent call last):
-...
-ConstraintNotSatisfied: hi
 
 >>> item.finish('draft')
 <...
@@ -145,7 +165,7 @@ ActivityStarted(Activity('quotationtool.article.review'))
 
 >>> item = editor_items.pop()
 >>> item
-<quotationtool.workflow.workitem.EditorialReviewWorkItem object at 0x...>
+<EditorialReviewWorkItem object at 0x...>
 
 >>> item.finish('needs_changes')
 <...

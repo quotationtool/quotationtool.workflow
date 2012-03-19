@@ -1,6 +1,6 @@
 import zope.component
 from zope.dublincore.interfaces import IWriteZopeDublinCore
-from z3c.indexer.index import SetIndex
+from z3c.indexer.index import SetIndex, ValueIndex
 from z3c.indexer.interfaces import IIndex
 
 from quotationtool.site.interfaces import INewQuotationtoolSiteEvent
@@ -46,3 +46,6 @@ def createWorkFlowContainer(event):
 
     sm['default']['workitem-contributor'] = contribs = SetIndex()
     sm.registerUtility(contribs, IIndex, name='workitem-contributors')
+
+    sm['default']['workitem-processid'] = processid = ValueIndex()
+    sm.registerUtility(processid, IIndex, name='workitem-processid')

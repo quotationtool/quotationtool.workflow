@@ -72,12 +72,14 @@ class ISimilarWorkItems(zope.interface.Interface):
     can the be found by calling getSimilarWorkItems(). This method
     simply queries the index."""
 
-    oid_attributes = zope.schema.Tuple(
-        title=_(u"Object Id Attributes"),
-        description=_(u"Names of attributes that hold database items relevant for the workflow process which are/may be registered by an IntIds utility."),
-        required=True,
-        default=(),
-        )
+    #oid_attributes = zope.schema.Tuple(
+    #    title=_(u"Object Id Attributes"),
+    #    description=_(u"Names of attributes that hold database items relevant for the workflow process which are/may be registered by an IntIds utility."),
+    #    required=True,
+    #    default=(),
+    #    )
+
+    objects = zope.interface.Attribute(""" Iterable of database items relevant for the workflow process/work item.""")
 
     def getSimilarWorkItems():
         """ Returns an iterator over similar work items, i.e. work items that """
@@ -171,6 +173,10 @@ class IFixed(zope.interface.Interface):
     removed."""
 
 
+class IRemoveWorkItem(IStandardParameters, IObjectParameter):
+    """ A work item in the quotationtool.remove workflow process."""
+
+
 class IRemoveSchema(zope.interface.Interface):
     """ Schema of workflow relevant data in a quotationtool.remove
     workflow."""
@@ -184,20 +190,8 @@ class IRemoveSchema(zope.interface.Interface):
         )
 
 
-class ISubjectOfMessage(zope.interface.Interface):
-    """ Marker interface for a content object on which a
-    quotationtool.message workflow can be performed."""
-
-
-class IMessageSchema(zope.interface.Interface):
-
-    answer = zope.schema.Choice(
-        title=u"Answer",
-        description=u"Input data passed to the finish method of the application.",
-        values=('answer', 'postpone'),
-        required=True,
-        default='answer',
-        )
+class IFixateWorkItem(IStandardParameters, IObjectParameter):
+    """ A work item in the quotationtool.fixate workflow process."""
 
 
 class IFixateSchema(zope.interface.Interface):
@@ -208,4 +202,24 @@ class IFixateSchema(zope.interface.Interface):
         values=('fixate', 'unfixate', 'reject', 'postpone'),
         required=True,
         default='fixate',
+        )
+
+
+class ISubjectOfMessage(zope.interface.Interface):
+    """ Marker interface for a content object on which a
+    quotationtool.message workflow can be performed."""
+
+
+class IMessageWorkItem(IStandardParameters, IObjectParameter):
+    """ A work item in the quotationtool.message workflow process."""
+
+
+class IMessageSchema(zope.interface.Interface):
+
+    answer = zope.schema.Choice(
+        title=u"Answer",
+        description=u"Input data passed to the finish method of the application.",
+        values=('answer', 'postpone'),
+        required=True,
+        default='answer',
         )

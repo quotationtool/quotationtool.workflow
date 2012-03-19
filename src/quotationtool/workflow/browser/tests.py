@@ -94,10 +94,14 @@ def setUpIntIds(test):
     zope.component.provideHandler(addIntIdSubscriber)
 
 def setUpIndexes(test):
-    from z3c.indexer.index import SetIndex
+    from z3c.indexer.index import SetIndex, ValueIndex
     from z3c.indexer.interfaces import IIndex
-    idx = SetIndex()
-    zope.component.provideUtility(idx, IIndex, name='workflow-relevant-oids')
+    oids = SetIndex()
+    zope.component.provideUtility(oids, IIndex, name='workflow-relevant-oids')
+    contributors = SetIndex()
+    zope.component.provideUtility(contributors, IIndex, name='workitem-contributors')
+    process_id = ValueIndex()
+    zope.component.provideUtility(process_id, IIndex, name='workitem-processid')
 
 
 class SkinTests(PlacelessSetup, unittest.TestCase):
@@ -240,6 +244,8 @@ class RemoveTests(PlacelessSetup, unittest.TestCase):
                 'form.buttons.remove': u"Remove",
                 })
         pagelet = remove.RemoveEditorialReview(item, request)
+        import transaction
+        transaction.commit()
         from zope.wfmc.interfaces import ProcessError
         self.assertRaises(ProcessError, pagelet.update)
         self.assertTrue(len(self.worklist) == 2)

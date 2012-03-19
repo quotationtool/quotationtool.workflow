@@ -83,16 +83,19 @@
 	/>
   </class>
 
-  <!-- similar work items -->
+  <adapter
+      for=".interfaces.IStandardParameters"
+      provides="z3c.indexer.interfaces.IIndexer"
+      factory=".workitem.ContributorsIndexer"
+      name="workitem-contributors-by-standardparameters"
+      />
 
   <adapter
-      for=".interfaces.ISimilarWorkItems"
+      for="zope.wfmc.interfaces.IWorkItem"
       provides="z3c.indexer.interfaces.IIndexer"
-      factory=".workitem.OIDsIndexer"
-      name="workflow-relevant-oids"
+      factory=".workitem.ProcessIdIndexer"
+      name="workitem-processid"
       />
-  <subscriber handler=".workitem.indexOIDs"/>
-  <subscriber handler=".workitem.unindexOIDs"/>
 
   <!-- components for quotationtool.remove workflow definition -->
 
@@ -128,6 +131,18 @@
 	interface=".interfaces.ISimilarWorkItems"/>
   </class>
 
+  <adapter
+      for=".interfaces.IRemoveWorkItem"
+      provides="z3c.indexer.interfaces.IIndexer"
+      factory=".workitem.OIDsIndexerByObjectAttribute"
+      name="quotationtool.remove-oids"
+      />
+  <adapter
+      for=".remove.RemoveWorkItem"
+      provides=".interfaces.ISimilarWorkItems"
+      factory=".workitem.SimilarWorkItemsByObjectAttribute"
+      />
+
   <!-- components for quotationtool.fixate workflow definition -->
 
   <wfmc:xpdl
@@ -160,6 +175,18 @@
 	interface=".interfaces.ISimilarWorkItems"/>
   </class>
 
+  <adapter
+      for=".interfaces.IFixateWorkItem"
+      provides="z3c.indexer.interfaces.IIndexer"
+      factory=".workitem.OIDsIndexerByObjectAttribute"
+      name="quotationtool.fixate-oids"
+      />
+  <adapter
+      for=".interfaces.IFixateWorkItem"
+      provides=".interfaces.ISimilarWorkItems"
+      factory=".workitem.SimilarWorkItemsByObjectAttribute"
+      />
+
   <!-- components for quotationtool.message workflow definition -->
 
   <wfmc:xpdl
@@ -191,6 +218,17 @@
 	interface=".interfaces.ISimilarWorkItems"/>
   </class>
 
+  <adapter
+      for=".interfaces.IMessageWorkItem"
+      provides="z3c.indexer.interfaces.IIndexer"
+      factory=".workitem.OIDsIndexerByObjectAttribute"
+      name="quotationtool.message-oids"
+      />
+  <adapter
+      for=".interfaces.IMessageWorkItem"
+      provides=".interfaces.ISimilarWorkItems"
+      factory=".workitem.SimilarWorkItemsByObjectAttribute"
+      />
 
   <include package=".browser"/>
 

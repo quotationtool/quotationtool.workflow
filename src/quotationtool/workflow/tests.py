@@ -32,15 +32,19 @@ def setUpOIDs(test):
         raise Exception
     intids = DummyIntIds()
     zope.component.provideUtility(intids, IIntIds)
-    from z3c.indexer.index import SetIndex
+    from z3c.indexer.index import SetIndex, ValueIndex
     from z3c.indexer.interfaces import IIndex
     oids = SetIndex()
     zope.component.provideUtility(oids, IIndex, name='workflow-relevant-oids')
+    contributors = SetIndex()
+    zope.component.provideUtility(contributors, IIndex, name='workitem-contributors')
+    process_id = ValueIndex()
+    zope.component.provideUtility(process_id, IIndex, name='workitem-processid')
     from testing import addIntIdSubscriber, removeIntIdSubscriber
     zope.component.provideHandler(addIntIdSubscriber)
     zope.component.provideHandler(removeIntIdSubscriber)
 
-def setUpArticle(test):
+def setUpDemo(test):
     placelesssetup.setUp(test)
     test.globs['this_directory'] = os.path.dirname(__file__)
     xmlconfig.XMLConfig('configure.zcml', quotationtool.workflow)()
@@ -79,8 +83,8 @@ class SiteCreationTests(PlacelessSetup, unittest.TestCase):
 def test_suite():
     return unittest.TestSuite((
             unittest.makeSuite(SiteCreationTests),
-            doctest.DocFileSuite('article.txt', globs={'zcml': zcml},
-                                 setUp = setUpArticle,
+            doctest.DocFileSuite('demo.txt', globs={'zcml': zcml},
+                                 setUp = setUpDemo,
                                  tearDown = tearDown,
                                  optionflags=_flags),
             doctest.DocFileSuite('remove.txt',

@@ -7,20 +7,17 @@ import zc.relation
 
 from quotationtool.workflow import interfaces
 from quotationtool.workflow.interfaces import _
-from quotationtool.workflow.workitem import WorkItemBase, SimilarWorkItemsMixin
+from quotationtool.workflow.workitem import WorkItemBase
 
 
-class RemoveWorkItem(WorkItemBase, SimilarWorkItemsMixin):
+class RemoveWorkItem(WorkItemBase):
     """ Application to remove a database item."""
 
-    zope.interface.implements(interfaces.IStandardParameters,
-                              interfaces.IObjectParameter)
+    zope.interface.implements(interfaces.IRemoveWorkItem)
 
     contributor = starttime = message = history = object_ = None 
 
     worklist = 'editor' # fix worklist!
-
-    oid_attributes = ('object_',) # see ISimilarWorkItems
 
     schema = interfaces.IRemoveSchema
 
@@ -82,7 +79,7 @@ class RemoveWorkItem(WorkItemBase, SimilarWorkItemsMixin):
 
             # assert that the item asked to be removed is not under
             # control of other workflow processes
-            similars = [item for item in self.getSimilarWorkItems()]
+            similars = [item for item in interfaces.ISimilarWorkItems(self).getSimilarWorkItems()]
             if similars:
                 raise ProcessError(_(
                         'wfmc-remove-still-similar',

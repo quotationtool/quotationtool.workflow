@@ -50,39 +50,6 @@ class WorkItemBase(Persistent, Location):
         return self.participant.__name__
 
 
-class ContributorWorkItem(WorkItemBase):
-
-    #worklist = 'contributor'
-
-    schema = interfaces.IEditSchema
-
-    def start(self):
-        self._appendToWorkList()
-
-    def finish(self, save):
-        self.schema['save'].validate(save)
-        # we remove the work item on save=='draft', too. It gets added by start again.
-        self._removeFromWorkList()
-        self.participant.activity.workItemFinished(self, save)
-
-
-class EditorialReviewWorkItem(WorkItemBase):
-
-    #worklist = 'editor'
-
-    schema = interfaces.IEditorialReviewSchema
-
-    def start(self):
-        self._appendToWorkList()
-
-    def finish(self, publish):
-        self.schema['publish'].validate(publish)
-        # we remove the work item on publish=='postpone', too. It gets
-        # added by start again.
-        self._removeFromWorkList()
-        self.participant.activity.workItemFinished(self, publish)
-
-
 class WorkflowInfo(object):
     """ Adapter that offers information about the workflow process
     which a work item is part of."""
@@ -102,18 +69,20 @@ class WorkflowInfo(object):
         return getattr(self.process_definition, '__name__', _(u"Unkown"))
         
 
-class SimilarWorkItemsMixin(object):
-    """ See ISimilarWorkItems"""
+class SimilarWorkItemsBase(object):
+    """ An base class for builing adapters. """
 
     zope.interface.implements(interfaces.ISimilarWorkItems)
 
-    oid_attributes = ()
+    def __init__(self, context):
+        self.context = context
 
     def getSimilarWorkItems(self):
+        """ See ISimilarWorkItems"""
         ids = []
         intids = zope.component.getUtility(IIntIds, context=self)
-        for attr in self.oid_attributes:
-            intid = intids.queryId(getattr(self, attr), None)
+        for obj in self.objects:
+            intid = intids.queryId(obj, None)
             if intid is not None:
                 ids.append(intid)
         #raise Exception(ids)
@@ -121,15 +90,35 @@ class SimilarWorkItemsMixin(object):
         res = query.apply()
         #raise Exception(res)
         for intid in res:
-            if intid != intids.getId(self):
+            if intid != intids.getId(self.context):
+                #raise Exception(intid)
                 yield intids.getObject(intid)
 
+    @property
+    def objects(self):
+        """ See ISimilarWorkItems"""
+        raise NotImplemented
 
-class OIDsIndexer(ValueIndexer):
-    """ Returns object ids of the object under workflow control."""
 
-    #zope.component.adapts(interfaces.ISimilarWorkItems)    
-    #zope.component.adapts(IWorkItem)
+class SimilarWorkItemsByObjectAttribute(SimilarWorkItemsBase):
+    """ SimilarWorkItems for workitems where the relevant database
+    item lives on the object_ attribute."""
+
+    @property
+    def objects(self):
+        obj = getattr(self.context, 'object_', None)
+        if obj:
+            return (obj,)
+        return ()
+
+
+class OIDsIndexerBase(ValueIndexer):
+    """ Base class for building indexers that index the IDs of
+    database items relevant for the workflow process/workitem in
+    context.
+
+    objects needs to be defined. It should return the database items
+    relevant for the workitem in context."""
 
     indexName = 'workflow-relevant-oids'
 
@@ -137,29 +126,56 @@ class OIDsIndexer(ValueIndexer):
     def value(self):
         ids = []
         intids = zope.component.getUtility(IIntIds, context=self.context)
-        for attr in self.context.oid_attributes:
-            i = intids.queryId(getattr(self.context, attr, None))
+        for obj in self.objects:
+            i = intids.queryId(obj)
             if i:
                 ids.append(i)
         return ids
 
-
-@zope.component.adapter(interfaces.ISimilarWorkItems, IIntIdAddedEvent)
-def indexOIDs(workitem, event):
-    indexer = zope.component.queryAdapter(
-        event.object, IIndexer, 
-        name='workflow-relevant-oids')
-    if indexer:
-        indexer.doIndex()
+    @property
+    def objects(self):
+        raise NotImplemented
 
 
-@zope.component.adapter(interfaces.ISimilarWorkItems, IIntIdRemovedEvent)
-def unindexOIDs(workitem, event):
-    indexer = zope.component.queryAdapter(
-        event.object, IIndexer, 
-        name='workflow-relevant-oids')
-    if indexer:
-        indexer.doUnIndex()
+class OIDsIndexerByObjectAttribute(OIDsIndexerBase):
+    """ Indexes oids for workitems where the relevant database
+    item lives on the object_ attribute.
+
+    Needs to be registered for specific work items."""
+
+    @property
+    def objects(self):
+        obj = getattr(self.context, 'object_', None)
+        if obj:
+            return (obj,)
+        return ()
+
+
+class ProcessIdIndexer(ValueIndexer):
+    """ Indexes the process id for work items."""
+
+    indexName = 'workitem-processid'
+
+    @property
+    def value(self):
+        participant = getattr(self.context, 'participant', None)
+        activity = getattr(participant, 'activity', None)
+        process = getattr(activity, 'process', None)
+        definition = getattr(process, 'definition', None)
+        return getattr(definition, '__name__', None)
+        
+
+class ContributorsIndexer(ValueIndexer):
+    """ Indexer for work items with standard parameters."""
+
+    indexName = 'workitem-contributors'
+
+    @property
+    def value(self):
+        contributors = getattr(self.context, 'contributor', None)
+        if contributors:
+            # OK?
+            return (contributors,)
 
 
 @zope.component.adapter(IObjectAddedEvent, IWorkItem)

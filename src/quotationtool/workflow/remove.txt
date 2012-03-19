@@ -182,6 +182,12 @@ True
 >>> proc2 = pd()
 >>> proc2.start('bob', datetime.datetime.now(), u"It's a foolisch item", None, bar)
 
+When using the collectors in z3c.indexer.subscriber indexing is done
+on a commit. So we call commit() here to get indexing done.
+
+>>> import transaction
+>>> transaction.commit()
+
 >>> item = editor_items.pop()
 
 >>> item.contributor
@@ -196,20 +202,22 @@ We can learn more using the ISimilarWorkItems interface:
 
 >>> from quotationtool.workflow.interfaces import ISimilarWorkItems
 >>> ISimilarWorkItems.providedBy(item)
-True
+False
 
->>> list(item.getSimilarWorkItems())
+>>> list(ISimilarWorkItems(item).getSimilarWorkItems())
 [<quotationtool.workflow.remove.RemoveWorkItem object at 0x...>]
 
 
 There is also in indexer that we want to test:
 
 >>> from z3c.indexer.interfaces import IIndexer
->>> indexer = zope.component.getAdapter(item, IIndexer, name='workflow-relevant-oids')
+>>> indexer = zope.component.getAdapter(item, IIndexer, name='quotationtool.remove-oids')
 >>> indexer.value == [barid]
 True
 
 >>> del container['bar']
+
+>>> transaction.commit()
 
 Relations
 +++++++++

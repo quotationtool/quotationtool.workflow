@@ -171,6 +171,8 @@ database items.
 This is done by integer IDs. There is an intids utility set up in test
 setup and also an index.
 
+    >>> import transaction
+
     >>> import zope.component
     >>> from zope.intid.interfaces import IIntIds
     >>> intids = zope.component.getUtility(IIntIds)
@@ -185,7 +187,8 @@ setup and also an index.
 
     >>> proc = pd()
     >>> proc.start('chris', None, None, None, foo)
- 
+    >>> transaction.commit()
+
     >>> qry = search.SearchQuery(query.AnyOf('workflow-relevant-oids', (oid,)))
     >>> result = qry.apply()
     >>> len(list(result))
@@ -197,6 +200,7 @@ setup and also an index.
     True
 
     >>> item.finish('reject', u"Done")
+    >>> transaction.commit()
     >>> qry = search.SearchQuery(query.AnyOf('workflow-relevant-oids', (oid,)))
     >>> result = qry.apply()
     >>> len(list(result))
