@@ -6,7 +6,7 @@ from zope.wfmc.interfaces import IWorkItem, IParticipant, ProcessError
 from zope.app.component.hooks import getSite
 from zope.intid.interfaces import IIntIds
 from z3c.indexer.interfaces import IIndex, IIndexer
-from z3c.indexer.query import AnyOf
+from z3c.indexer.query import AnyOf, Eq
 from z3c.indexer.search import SearchQuery
 from z3c.indexer.indexer import ValueIndexer
 from zope.intid.interfaces import IIntIdAddedEvent, IIntIdRemovedEvent
@@ -162,8 +162,20 @@ class ProcessIdIndexer(ValueIndexer):
         activity = getattr(participant, 'activity', None)
         process = getattr(activity, 'process', None)
         definition = getattr(process, 'definition', None)
-        return getattr(definition, '__name__', None)
+        #raise Exception(getattr(definition, 'id', None))
+        return getattr(definition, 'id', None)
         
+
+def findWorkItemsForItemAndProcessId(item, process_id):
+    """ Returns workitems for 'item' 'process_id'."""
+    intids =zope.component.getUtility(IIntIds, context=getSite())
+    iid = intids.queryId(item, None)
+    if not iid: return [] # maybe but we are not able to know
+    oidsQuery = AnyOf('workflow-relevant-oids', [iid])
+    pidQuery = Eq('workitem-processid', process_id)
+    query = SearchQuery(oidsQuery).And(pidQuery)
+    return query.searchResults()
+
 
 class ContributorsIndexer(ValueIndexer):
     """ Indexer for work items with standard parameters."""

@@ -137,8 +137,12 @@ class Reset(object):
         for activity_id, activity in process.activities.items():
             if activity == current_activity:
                 continue
-            for item_id, workitem in activity.workitems.items():
-                workitem[0].destroy()
+            # We determine the open activity by the open work
+            # item. Does this have any risk?
+            if activity.workitems:
+                for item_id, workitem in activity.workitems.items():
+                    workitem[0].destroy()
+                del process.activities[activity_id]
 
 
 class EditorialReview(workitem.WorkItemBase):
@@ -177,7 +181,8 @@ class CancellingContext(object):
     
     implements(IProcessContext)
 
-    def processFinished(self, history, object_):
+    def processFinished(self, process, history, object_):
+        self.process = process
         self.history = history
         self.object_ = object_
         self.finishedHook()

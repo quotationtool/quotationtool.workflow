@@ -84,6 +84,7 @@ ActivityStarted(Activity('quotationtool.remove.review'))
 >>> item
 <quotationtool.workflow.remove.RemoveWorkItem object at 0x...>
 
+
 >>> item.finish('postpone')
 <...
 WorkItemFinished(u'remove')
@@ -94,6 +95,7 @@ ActivityStarted(Activity('quotationtool.remove.review'))
 
 >>> len(container)
 1
+
 
 >>> item = editor_items.pop()
 >>> item.finish('remove')
@@ -201,11 +203,15 @@ ProcessError: wfmc-remove-still-similar
 We can learn more using the ISimilarWorkItems interface:
 
 >>> from quotationtool.workflow.interfaces import ISimilarWorkItems
->>> ISimilarWorkItems.providedBy(item)
-False
-
 >>> list(ISimilarWorkItems(item).getSimilarWorkItems())
 [<quotationtool.workflow.remove.RemoveWorkItem object at 0x...>]
+
+
+We can use a function to find items.
+
+>>> from quotationtool.workflow.workitem import findWorkItemsForItemAndProcessId
+>>> [item for item in findWorkItemsForItemAndProcessId(bar, 'quotationtool.remove')]
+[<quotationtool.workflow.remove.RemoveWorkItem object at 0x...>, <quotationtool.workflow.remove.RemoveWorkItem object at 0x...>]
 
 
 There is also in indexer that we want to test:
@@ -302,3 +308,5 @@ But if bar is unindexed then we will be able to remove foo.
 >>> item.finish('remove')
 >>> 'foo' in container
 False
+
+

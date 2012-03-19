@@ -64,20 +64,12 @@ class ISimilarWorkItems(zope.interface.Interface):
     database items a work item/a workflow process deals with. 
 
     This is done by indexing the intids of the database items relevant
-    for a work item. There is an indexer registered for workitems that
-    implement ISimilarWorkItems and that gets the intids by means of
-    'oid_attributes'.
+    for a work item. So there have to be indexers. And we can then use
+    adapters that provide ISimilarWorkItems to find similar items.
 
     Similar work items (== items that work on the same database items)
     can the be found by calling getSimilarWorkItems(). This method
     simply queries the index."""
-
-    #oid_attributes = zope.schema.Tuple(
-    #    title=_(u"Object Id Attributes"),
-    #    description=_(u"Names of attributes that hold database items relevant for the workflow process which are/may be registered by an IntIds utility."),
-    #    required=True,
-    #    default=(),
-    #    )
 
     objects = zope.interface.Attribute(""" Iterable of database items relevant for the workflow process/work item.""")
 
