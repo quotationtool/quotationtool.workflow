@@ -151,6 +151,24 @@ class OIDsIndexerByObjectAttribute(OIDsIndexerBase):
         return ()
 
 
+class OIDsIndexerByContextItem(OIDsIndexerBase):
+    """ Indexes oids for workitems where the relevant database item
+    lives on the 'item' attribute of the process context.
+
+    Needs to be registered for specific work items."""
+
+    @property
+    def objects(self):
+        participant = getattr(self.context, 'participant', None)
+        activity = getattr(participant, 'activity', None)
+        process = getattr(activity, 'process', None)
+        context = getattr(process, 'context', None)
+        item = getattr(process, 'context', None)
+        if item: 
+            return (item,)
+        return ()
+
+
 class ProcessIdIndexer(ValueIndexer):
     """ Indexes the process id for work items."""
 
