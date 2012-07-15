@@ -1,3 +1,13 @@
+from z3c.indexer.index import SetIndex, ValueIndex
+from z3c.indexer.interfaces import IIndex
+
+def setUpIndices(test):
+    zope.component.provideUtility(SetIndex(), IIndex, name='workflow-relevant-oids')
+    zope.component.provideUtility(SetIndex(), IIndex, name='workitem-contributors')
+    zope.component.provideUtility(ValueIndex(), IIndex, name='workitem-processid')
+
+
+#BBB: replace with zope.intid and zope.keyreference.testing.SimpleKeyReference 
 import random
 
 import zope.component
@@ -13,8 +23,6 @@ from zope.location.interfaces import IContained
 import zope.event
 from zope.intid.interfaces import IIntIds, IIntIdEvent
 from zope.intid.interfaces import IntIdAddedEvent, IntIdRemovedEvent
-
-
 
 class DummyIntIds(object):
 

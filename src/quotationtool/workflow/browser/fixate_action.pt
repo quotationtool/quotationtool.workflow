@@ -1,6 +1,9 @@
 <div class="itemaction fixate-action" i18n:domain="quotationtool">
   <a class="internal itemaction" href="@@fixate.html#tabs"
      tal:attributes="href string:${context/@@absolute_url}/@@fixate.html#tabs"
-     ><img src="" alt="Fixation" i18n:attributes="alt fixate-action"/>
+     title="Fixation" i18n:attributes="title fixate-action"
+     ><img src="/@@/quotationtool.images/fixate.png"
+     tal:attributes="src string:${request/URL/0}/@@/quotationtool.images/fixate.png"
+     alt="Fixation" i18n:attributes="alt fixate-action"/>
   </a>
 </div>

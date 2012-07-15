@@ -1,6 +1,9 @@
 <div class="itemaction remove-action" i18n:domain="quotationtool">
   <a class="internal itemaction" href="@@remove.html#tabs"
      tal:attributes="href string:${context/@@absolute_url}/@@remove.html#tabs"
-     ><img src="" alt="Remove" i18n:attributes="alt remove-action"/>
+     title="Remove" i18n:attributes="title remove-action"
+     ><img src="/@@/quotationtool.images/edit-remove-3.png"
+     tal:attributes="src string:${request/URL/0}/@@/quotationtool.images/remove.png"
+     alt="Remove" i18n:attributes="alt remove-action"/>
   </a>
 </div>
