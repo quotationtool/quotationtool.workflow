@@ -80,7 +80,7 @@ class SimilarWorkItemsBase(object):
     def getSimilarWorkItems(self):
         """ See ISimilarWorkItems"""
         ids = []
-        intids = zope.component.getUtility(IIntIds, context=self)
+        intids = zope.component.getUtility(IIntIds, context=self.context)
         for obj in self.objects:
             intid = intids.queryId(obj, None)
             if intid is not None:
