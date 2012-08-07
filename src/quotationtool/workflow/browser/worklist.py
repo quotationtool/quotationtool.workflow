@@ -146,6 +146,7 @@ class ProcessStartedColumn(column.Column):
 
 
 class ProcessColumn(column.Column):
+    """ Tries to lookup a view called 'processName' for the item."""
 
     implements(ISortingColumn)
 
@@ -153,7 +154,12 @@ class ProcessColumn(column.Column):
     weight = 100
 
     def renderCell(self, item):
-        return interfaces.IWorkflowInfo(item).process_name
+        view = zope.component.queryMultiAdapter(
+            (item, self.request), name='processName')
+        if view:
+            return view()
+        else:
+            return interfaces.IWorkflowInfo(item).process_name
 
 
 class WorkItemColumn(column.Column):
@@ -255,15 +261,23 @@ class ObjectLabelColumn(column.Column):
     weight = 108
 
     def renderCell(self, item):
-        obj = getattr(item, 'object_', None)
-        if obj is None:
-            return _(u"Unkown")
-        label =  zope.component.getMultiAdapter(
-            (obj, self.request), name='label')()
+        # 1.1: try to get view named objectLabel for work item
+        label =  zope.component.queryMultiAdapter(
+            (item, self.request), name='objectLabel')
+        if not label:
+            # 1.2: try to get object from object_ attribute and lookup
+            # label view
+            obj = getattr(item, 'object_', None)
+            if obj is None:
+                # 1.3: return default label
+                return _(u"Unkown")
+            label =  zope.component.getMultiAdapter(
+                (obj, self.request), name='label')
+        # 2: translate label and return
         try:
-            return translate(label, context=self.request)
+            return translate(label(), context=self.request)
         except Exception:
-            return label
+            return label()
 
 
 class EditMeta(form.EditForm):

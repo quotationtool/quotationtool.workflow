@@ -1,10 +1,38 @@
 from z3c.indexer.index import SetIndex, ValueIndex
 from z3c.indexer.interfaces import IIndex
+import zope.component
+from zope.app.component import hooks
 
 def setUpIndices(test):
-    zope.component.provideUtility(SetIndex(), IIndex, name='workflow-relevant-oids')
-    zope.component.provideUtility(SetIndex(), IIndex, name='workitem-contributors')
-    zope.component.provideUtility(ValueIndex(), IIndex, name='workitem-processid')
+    site = hooks.getSite()
+    if zope.component.interfaces.ISite.providedBy(site):
+        sm = site.getSiteManager()
+        sm['default']['workflow-relevant-oids'] = idx = SetIndex()
+        sm.registerUtility(idx, IIndex, name='workflow-relevant-oids')
+        sm['default']['workitem-contributor'] = idx = SetIndex()
+        sm.registerUtility(idx, IIndex, name='workitem-contributors')
+        sm['default']['workitem-processid'] = idx = ValueIndex()
+        sm.registerUtility(idx, IIndex, name='workitem-processid')
+    else:
+        zope.component.provideUtility(SetIndex(), IIndex, name='workflow-relevant-oids')
+        zope.component.provideUtility(SetIndex(), IIndex, name='workitem-contributors')
+        zope.component.provideUtility(ValueIndex(), IIndex, name='workitem-processid')
+
+
+def setUpWorkLists(root):
+    if zope.component.interfaces.ISite.providedBy(root):
+        sm = root.getSiteManager()
+    from quotationtool.workflow.container import WorkFlowContainer
+    root['workflow'] = container = WorkFlowContainer()
+    from quotationtool.workflow.worklist import WorkList
+    from quotationtool.workflow.interfaces import IWorkList
+    for name in ('contributor', 'editor', 'technicaleditor', 'script'):
+        container[name] = WorkList()
+        if zope.component.interfaces.ISite.providedBy(root):
+            sm.registerUtility(container[name], IWorkList, name=name)
+        else:
+            zope.component.provideUtility(container[name], IWorkList, name=name)
+
 
 
 #BBB: replace with zope.intid and zope.keyreference.testing.SimpleKeyReference 
