@@ -93,7 +93,7 @@ class ProcessStartedNotation(NotationBase):
 
     def __repr__(self):
         return _('process-started-notation',
-                 u"$NAME workflow process ($ID) started by $CONTRIB. $DESC", 
+                 u"$ID workflow process started by $CONTRIB.", 
                  mapping={'NAME': self.name, 
                           'ID': self.pid,
                           'DESC': self.description, 

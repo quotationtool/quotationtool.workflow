@@ -163,7 +163,7 @@ class OIDsIndexerByContextItem(OIDsIndexerBase):
         activity = getattr(participant, 'activity', None)
         process = getattr(activity, 'process', None)
         context = getattr(process, 'context', None)
-        item = getattr(process, 'context', None)
+        item = getattr(context, 'item', None)
         if item: 
             return (item,)
         return ()
