@@ -13,10 +13,13 @@ def setUpIndices(test):
         sm.registerUtility(idx, IIndex, name='workitem-contributors')
         sm['default']['workitem-processid'] = idx = ValueIndex()
         sm.registerUtility(idx, IIndex, name='workitem-processid')
+        sm['default']['worklist-value'] = idx = ValueIndex()
+        sm.registerUtility(idx, IIndex, name='worklist-value')
     else:
         zope.component.provideUtility(SetIndex(), IIndex, name='workflow-relevant-oids')
         zope.component.provideUtility(SetIndex(), IIndex, name='workitem-contributors')
         zope.component.provideUtility(ValueIndex(), IIndex, name='workitem-processid')
+        zope.component.provideUtility(ValueIndex(), IIndex, name='worklist-value')
 
 
 def setUpWorkLists(root):

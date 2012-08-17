@@ -49,3 +49,6 @@ def createWorkFlowContainer(event):
 
     sm['default']['workitem-processid'] = processid = ValueIndex()
     sm.registerUtility(processid, IIndex, name='workitem-processid')
+
+    sm['default']['worklist-value'] = idx = ValueIndex()
+    sm.registerUtility(idx, IIndex, name='worklist-value')

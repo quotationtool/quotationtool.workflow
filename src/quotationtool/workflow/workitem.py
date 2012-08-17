@@ -230,3 +230,13 @@ def lastActivitySubscriber(event, item):
             principalid = participation.principal.id
             if not principalid in dc.creators:
                 dc.creators = dc.creators + (unicode(principalid), )
+
+
+class WorkListIndexer(ValueIndexer):
+    """ Indexes work item in the worklist-value index."""
+
+    indexName = 'worklist-value'
+    
+    @property
+    def value(self):
+        return getattr(self.context, 'worklist', 'undefined')

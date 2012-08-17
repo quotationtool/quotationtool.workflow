@@ -11,25 +11,16 @@ from zope.security.testing import Principal
 from zope.intid.interfaces import IIntIds
 from zope.site.folder import rootFolder
 
-import quotationtool.workflow
-
 from quotationtool.skin.interfaces import IQuotationtoolBrowserLayer 
+
+import quotationtool.workflow
+from quotationtool.workflow import testing
 
 
 def setUpZCML(test):
     setUp(test)
     XMLConfig('configure.zcml', quotationtool.workflow)()
     XMLConfig('configure.zcml', quotationtool.workflow.browser)()
-
-
-def setUpWorkLists(site):
-    from quotationtool.workflow.container import WorkFlowContainer
-    site['workflow'] = container = WorkFlowContainer()
-    from quotationtool.workflow.worklist import WorkList
-    from quotationtool.workflow.interfaces import IWorkList
-    for name in ('contributor', 'editor', 'technicaleditor', 'script'):
-        container[name] = WorkList()
-        zope.component.provideUtility(container[name], IWorkList, name=name)
 
 
 from zope.interface import Interface, implements
@@ -93,16 +84,6 @@ def setUpIntIds(test):
     zope.component.provideHandler(removeIntIdSubscriber)
     zope.component.provideHandler(addIntIdSubscriber)
 
-def setUpIndexes(test):
-    from z3c.indexer.index import SetIndex, ValueIndex
-    from z3c.indexer.interfaces import IIndex
-    oids = SetIndex()
-    zope.component.provideUtility(oids, IIndex, name='workflow-relevant-oids')
-    contributors = SetIndex()
-    zope.component.provideUtility(contributors, IIndex, name='workitem-contributors')
-    process_id = ValueIndex()
-    zope.component.provideUtility(process_id, IIndex, name='workitem-processid')
-
 
 class SkinTests(PlacelessSetup, unittest.TestCase):
     
@@ -140,8 +121,8 @@ class RemoveTests(PlacelessSetup, unittest.TestCase):
         setUpIntIds(self)
         setUpRelationCatalog(self)
         self.root = rootFolder()
-        setUpWorkLists(self.root)
-        setUpIndexes(self)
+        testing.setUpWorkLists(self.root)
+        testing.setUpIndices(self)
         generateContent(self.root)
         from quotationtool.workflow.interfaces import IWorkList
         self.worklist = zope.component.getUtility(IWorkList, name='editor', context=self.root)
@@ -286,8 +267,8 @@ class FixateTests(PlacelessSetup, unittest.TestCase):
         setUpIntIds(self)
         setUpRelationCatalog(self)
         self.root = rootFolder()
-        setUpWorkLists(self.root)
-        setUpIndexes(self)
+        testing.setUpWorkLists(self.root)
+        testing.setUpIndices(self)
         generateContent(self.root)
         from quotationtool.workflow.interfaces import IWorkList
         self.worklist = zope.component.getUtility(IWorkList, name='editor', context=self.root)
@@ -425,8 +406,8 @@ class MessageTests(PlacelessSetup, unittest.TestCase):
         setUpIntIds(self)
         setUpRelationCatalog(self)
         self.root = rootFolder()
-        setUpWorkLists(self.root)
-        setUpIndexes(self)
+        testing.setUpWorkLists(self.root)
+        testing.setUpIndices(self)
         generateContent(self.root)
         from quotationtool.workflow.interfaces import IWorkList
         self.worklist = zope.component.getUtility(IWorkList, name='editor', context=self.root)
@@ -509,7 +490,7 @@ class ListWorkListsTests(PlacelessSetup, unittest.TestCase):
         super(ListWorkListsTests, self).setUp()
         setUpZCML(self)
         self.root = rootFolder()
-        setUpWorkLists(self.root)
+        testing.setUpWorkLists(self.root)
 
     def tearDown(self):
         tearDown(self)
@@ -529,8 +510,8 @@ class WorkListTests(PlacelessSetup, unittest.TestCase):
         setUpIntIds(self)
         setUpRelationCatalog(self)
         self.root = rootFolder()
-        setUpWorkLists(self.root)
-        setUpIndexes(self)
+        testing.setUpWorkLists(self.root)
+        testing.setUpIndices(self)
         generateContent(self.root)
         from quotationtool.workflow.interfaces import IWorkList
         self.worklist = zope.component.getUtility(IWorkList, name='editor', context=self.root)
@@ -555,8 +536,8 @@ class WorkflowHistoryTests(PlacelessSetup, unittest.TestCase):
         setUpIntIds(self)
         setUpRelationCatalog(self)
         self.root = rootFolder()
-        setUpWorkLists(self.root)
-        setUpIndexes(self)
+        testing.setUpWorkLists(self.root)
+        testing.setUpIndices(self)
         generateContent(self.root)
         from quotationtool.workflow.interfaces import IWorkList
         self.worklist = zope.component.getUtility(IWorkList, name='editor', context=self.root)
@@ -590,8 +571,8 @@ class WorkItemTests(PlacelessSetup, unittest.TestCase):
         setUpIntIds(self)
         setUpRelationCatalog(self)
         self.root = rootFolder()
-        setUpWorkLists(self.root)
-        setUpIndexes(self)
+        testing.setUpWorkLists(self.root)
+        testing.setUpIndices(self)
         generateContent(self.root)
         from quotationtool.workflow.interfaces import IWorkList
         self.worklist = zope.component.getUtility(IWorkList, name='editor', context=self.root)

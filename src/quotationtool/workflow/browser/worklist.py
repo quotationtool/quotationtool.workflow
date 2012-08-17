@@ -11,7 +11,7 @@ from zope.app.pagetemplate.viewpagetemplatefile import ViewPageTemplateFile
 from z3c.form import field
 from z3c.formui import form
 from z3c.indexer.search import SearchQuery
-from z3c.indexer.query import AnyOf
+from z3c.indexer.query import AnyOf, Eq
 
 from quotationtool.user.interfaces import IAccountView
 
@@ -125,7 +125,9 @@ class AccountValues(value.ValuesMixin):
     @property
     def values(self):
         principal_id = self.request.principal.id
-        query = SearchQuery(AnyOf('workitem-contributors', (principal_id,)))
+        contributorQuery = AnyOf('workitem-contributors', (principal_id,))
+        worklistQuery = Eq('worklist-value', 'contributor')
+        query = SearchQuery(contributorQuery).And(worklistQuery)
         return query.searchResults()
 
 

@@ -10,6 +10,7 @@ from zope.site.folder import rootFolder
 from zope.app.testing.setup import placefulSetUp, placefulTearDown
 
 import quotationtool.workflow
+from quotationtool.workflow import testing
 
 _flags = doctest.NORMALIZE_WHITESPACE|doctest.ELLIPSIS
 
@@ -32,14 +33,7 @@ def setUpOIDs(test):
         raise Exception
     intids = DummyIntIds()
     zope.component.provideUtility(intids, IIntIds)
-    from z3c.indexer.index import SetIndex, ValueIndex
-    from z3c.indexer.interfaces import IIndex
-    oids = SetIndex()
-    zope.component.provideUtility(oids, IIndex, name='workflow-relevant-oids')
-    contributors = SetIndex()
-    zope.component.provideUtility(contributors, IIndex, name='workitem-contributors')
-    process_id = ValueIndex()
-    zope.component.provideUtility(process_id, IIndex, name='workitem-processid')
+    testing.setUpIndices(test)
     from testing import addIntIdSubscriber, removeIntIdSubscriber
     zope.component.provideHandler(addIntIdSubscriber)
     zope.component.provideHandler(removeIntIdSubscriber)

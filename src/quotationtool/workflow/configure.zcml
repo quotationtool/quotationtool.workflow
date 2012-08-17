@@ -97,6 +97,13 @@
       name="workitem-processid"
       />
 
+  <adapter
+      factory=".workitem.WorkListIndexer"
+      for=".workitem.WorkItemBase"
+      provides="z3c.indexer.interfaces.IIndexer"
+      name="worklist-value"
+      />
+
   <!-- components for quotationtool.remove workflow definition -->
 
   <wfmc:xpdl
